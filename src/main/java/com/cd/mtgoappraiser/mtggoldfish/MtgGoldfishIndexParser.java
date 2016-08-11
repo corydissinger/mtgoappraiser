@@ -1,6 +1,7 @@
 package com.cd.mtgoappraiser.mtggoldfish;
 
 import com.cd.mtgoappraiser.model.CSVCard;
+import com.cd.mtgoappraiser.model.MtgGoldfishCard;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -27,10 +28,17 @@ public class MtgGoldfishIndexParser {
         return indexUrls;
     }
 
-    public List<CSVCard> getCardsFromPage(Document theHtml) {
-        List<CSVCard> parsedCards = new ArrayList<>();
+    public List<MtgGoldfishCard> getCardsFromPage(Document theHtml) {
+        List<Element> cardsInFormat = theHtml.select("body > div.container-fluid.layout-container-fluid > div.index-price-table > div.index-price-table-online > table > tbody > tr");
 
-        List<Element> cardsInFormat = theHtml.select("body > div.container-fluid.layout-container-fluid > div.index-price-table > div.index-price-table-online > table > tbody > tr:nth-child(1)");
+        List<MtgGoldfishCard> parsedCards = cardsInFormat.stream().map(rawCard -> {
+            MtgGoldfishCard parsedCard = new MtgGoldfishCard();
+
+            parsedCard.setName(rawCard.select("td.card > a").text());
+            parsedCard.setPrice(Double.parseDouble(rawCard.select("td.text-right").first().text()));
+
+            return parsedCard;
+        }).collect((Collectors.toCollection(ArrayList::new)));
 
         return parsedCards;
     }

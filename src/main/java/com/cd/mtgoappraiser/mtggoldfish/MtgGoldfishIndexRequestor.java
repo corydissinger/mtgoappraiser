@@ -1,6 +1,7 @@
 package com.cd.mtgoappraiser.mtggoldfish;
 
 import com.cd.mtgoappraiser.model.CSVCard;
+import com.cd.mtgoappraiser.model.MtgGoldfishCard;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -27,7 +28,7 @@ public class MtgGoldfishIndexRequestor {
         return mtgGoldfishIndexParser.getIndexUrls(theHtml);
     }
 
-    public List<CSVCard> getCardsFromPage(String pageUrl) {
+    public List<MtgGoldfishCard> getCardsFromPage(String pageUrl) {
         Document theHtml;
 
         try {

@@ -1,5 +1,6 @@
 package com.cd.mtgoappraiser;
 
+import com.cd.mtgoappraiser.model.MtgGoldfishCard;
 import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,6 +55,21 @@ public class MtgGoldfishIndexParserTest {
 
         assertTrue(indexUrls != null);
         assertTrue(indexUrls.size() == 46);
+    }
+
+    @Test
+    public void testParsePrices() throws Exception {
+        InputStream theCards = loadResource("standardsoi.html");
+
+        Document theHtml = Jsoup.parse(theCards, "UTF-8", "");
+
+        List<MtgGoldfishCard> cards = mtgoGoldfishIndexParser.getCardsFromPage(theHtml);
+
+        assertTrue(cards != null);
+        assertTrue(cards.size() == 404);
+
+        cards.stream().forEach(card -> {assertTrue(card.getName() != null);
+                                        assertTrue(card.getPrice() != null);});
     }
 
     private InputStream loadResource(String resourceName) throws IOException {
