@@ -1,20 +1,16 @@
 package com.cd.mtgoappraiser.csv;
 
-import com.cd.mtgoappraiser.model.CSVCard;
+import com.cd.mtgoappraiser.model.Card;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -29,15 +25,15 @@ public class MtgoCSVParser {
     private static final String HEADER_SET      = "Set";
     private static final String HEADER_PREMIUM  = "Premium";
 
-    public List<CSVCard> getCards(URL urlToCollection) {
-        List<CSVCard> cards = null;
+    public List<Card> getCards(URL urlToCollection) {
+        List<Card> cards = null;
 
         try {
             Iterable<CSVRecord> records = CSVParser.parse(urlToCollection, Charset.defaultCharset(), CSVFormat.RFC4180.withHeader());
 
             cards = StreamSupport.stream(records.spliterator(), false)
                                     .map(csvRecord -> {
-                                        CSVCard theCard = new CSVCard();
+                                        Card theCard = new Card();
 
                                         theCard.setName(csvRecord.get(HEADER_NAME));
                                         theCard.setQuantity(Integer.parseInt(csvRecord.get(HEADER_QUANTITY)));

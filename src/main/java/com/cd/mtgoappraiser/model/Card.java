@@ -3,7 +3,7 @@ package com.cd.mtgoappraiser.model;
 /**
  * Created by Cory on 7/16/2016.
  */
-public class CSVCard {
+public class Card {
     private String name;
     private Integer quantity;
     private String set;

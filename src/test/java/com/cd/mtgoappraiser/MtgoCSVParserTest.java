@@ -1,7 +1,7 @@
 package com.cd.mtgoappraiser;
 
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
-import com.cd.mtgoappraiser.model.CSVCard;
+import com.cd.mtgoappraiser.model.Card;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class MtgoCSVParserTest {
     public void testParseCollection() throws Exception {
         URL urlToCollection = loadResource("testCollection.csv");
 
-        List<CSVCard> cards = mtgoCsvParser.getCards(urlToCollection);
+        List<Card> cards = mtgoCsvParser.getCards(urlToCollection);
 
         assertTrue(cards != null);
         assertTrue(cards.size() == 681);

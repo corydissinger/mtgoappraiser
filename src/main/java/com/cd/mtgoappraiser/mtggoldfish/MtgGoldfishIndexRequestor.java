@@ -1,6 +1,5 @@
 package com.cd.mtgoappraiser.mtggoldfish;
 
-import com.cd.mtgoappraiser.model.CSVCard;
 import com.cd.mtgoappraiser.model.MtgGoldfishCard;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.LocalDate;

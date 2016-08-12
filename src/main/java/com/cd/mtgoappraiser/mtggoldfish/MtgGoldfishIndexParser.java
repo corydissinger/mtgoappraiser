@@ -1,16 +1,9 @@
 package com.cd.mtgoappraiser.mtggoldfish;
 
-import com.cd.mtgoappraiser.model.CSVCard;
 import com.cd.mtgoappraiser.model.MtgGoldfishCard;
-import org.apache.commons.io.FileUtils;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
