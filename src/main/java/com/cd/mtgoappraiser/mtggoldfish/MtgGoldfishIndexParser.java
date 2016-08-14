@@ -28,7 +28,7 @@ public class MtgGoldfishIndexParser {
             MtgGoldfishCard parsedCard = new MtgGoldfishCard();
 
             parsedCard.setName(rawCard.select("td.card > a").text());
-            parsedCard.setPrice(Double.parseDouble(rawCard.select("td.text-right").first().text()));
+            parsedCard.setRetailPrice(Double.parseDouble(rawCard.select("td.text-right").first().text()));
 
             return parsedCard;
         }).collect((Collectors.toCollection(ArrayList::new)));

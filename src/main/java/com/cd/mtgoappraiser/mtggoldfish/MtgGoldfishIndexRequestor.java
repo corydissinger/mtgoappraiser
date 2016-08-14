@@ -75,24 +75,12 @@ public class MtgGoldfishIndexRequestor {
         return theFormat + todayString;
     }
 
-    public File getCacheFolder() {
-        return cacheFolder;
-    }
-
     public void setCacheFolder(File cacheFolder) {
         this.cacheFolder = cacheFolder;
     }
 
-    public String getMtgoGoldfishBaseUrl() {
-        return mtgoGoldfishBaseUrl;
-    }
-
     public void setMtgoGoldfishBaseUrl(String mtgoGoldfishBaseUrl) {
         this.mtgoGoldfishBaseUrl = mtgoGoldfishBaseUrl;
-    }
-
-    public MtgGoldfishIndexParser getMtgGoldfishIndexParser() {
-        return mtgGoldfishIndexParser;
     }
 
     public void setMtgGoldfishIndexParser(MtgGoldfishIndexParser mtgGoldfishIndexParser) {

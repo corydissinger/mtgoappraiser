@@ -10,15 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.expression.ExpressionException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -69,7 +66,7 @@ public class MtgGoldfishIndexParserTest {
         assertTrue(cards.size() == 404);
 
         cards.stream().forEach(card -> {assertTrue(card.getName() != null);
-                                        assertTrue(card.getPrice() != null);});
+                                        assertTrue(card.getRetailPrice() != null);});
     }
 
     private InputStream loadResource(String resourceName) throws IOException {

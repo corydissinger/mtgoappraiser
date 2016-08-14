@@ -1,8 +1,10 @@
 package com.cd.mtgoappraiser;
 
+import com.cd.mtgoappraiser.appraiser.CollectionAppraiser;
 import com.cd.mtgoappraiser.config.AppraiserConfig;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
+import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexRequestor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -14,7 +16,8 @@ public class Main {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppraiserConfig.class);
 
         MtgoCSVParser mtgoCsvParser = (MtgoCSVParser) applicationContext.getBean("mtgoCsvParser");
-        MtgGoldfishIndexParser mtgGoldfishIndexParser = (MtgGoldfishIndexParser) applicationContext.getBean("mtgoCsvParser");
+        MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = (MtgGoldfishIndexRequestor) applicationContext.getBean("mtgGoldfishIndexRequestor");
+        CollectionAppraiser collectionAppraiser = (CollectionAppraiser) applicationContext.getBean("collectionAppraiser");
 
         /*
         Function<String, List<Card>> urlToCards = new Function<String, List<Card>>() {
