@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,16 +23,22 @@ public class MtgGoldfishIndexRequestor {
     private String mtgoGoldfishBaseUrl;
     private MtgGoldfishIndexParser mtgGoldfishIndexParser;
 
-    public List<String> getIndexUrls() throws Exception {
-        Document theHtml = loadFromCache(mtgoGoldfishBaseUrl + INDICES);
-        return mtgGoldfishIndexParser.getIndexUrls(theHtml);
+    public List<String> getIndexUrls() {
+        try {
+            Document theHtml = loadFromCache(mtgoGoldfishBaseUrl + INDICES);
+            return mtgGoldfishIndexParser.getIndexUrls(theHtml);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     public List<MtgGoldfishCard> getCardsFromPage(String pageUrl) {
         Document theHtml;
 
         try {
-            theHtml = loadFromCache(pageUrl);
+            theHtml = loadFromCache(mtgoGoldfishBaseUrl + pageUrl + "#online");
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -43,7 +50,7 @@ public class MtgGoldfishIndexRequestor {
     private Document loadFromCache(String pageUrl) throws Exception {
         String tempFileName = getTempFileName(pageUrl);
 
-        File formatCache = new File(cacheFolder + tempFileName);
+        File formatCache = new File(cacheFolder + File.separator + tempFileName);
 
         Document theHtml;
 
@@ -62,14 +69,14 @@ public class MtgGoldfishIndexRequestor {
 
         String theFormat = pageParts[pageParts.length - 1];
 
-        if(!theFormat.contains("#") || INDICES.equals(theFormat)) {
+        if(theFormat == null) {
             throw new Exception("Could not parse URL, unable to get local temp file name.");
+        } else if (theFormat.contains("#")) {
+            theFormat = theFormat.substring(0, theFormat.indexOf("#"));
         }
 
-        theFormat = theFormat.substring(0, theFormat.indexOf("#") - 1);
-
         LocalDate date = LocalDate.now();
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("mdmdyyyy");
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("MMddyyyy");
         String todayString = date.toString(fmt);
 
         return theFormat + todayString;

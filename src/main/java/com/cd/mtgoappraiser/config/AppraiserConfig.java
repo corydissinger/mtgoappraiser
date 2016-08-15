@@ -5,20 +5,24 @@ import com.cd.mtgoappraiser.csv.CsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
 import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexRequestor;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({ "com.cd.mtgoappraiser" })
-@PropertySource(value = { "classpath:application.properties" })
+@PropertySources({
+    @PropertySource(value = { "classpath:application.properties" }),
+    @PropertySource(value = "file:./application.properties", ignoreResourceNotFound = true )
+})
+
 public class AppraiserConfig {
 
     @Autowired
@@ -64,6 +68,24 @@ public class AppraiserConfig {
     public MtgoCSVParser mtgoCsvParser() {
         MtgoCSVParser parser = new MtgoCSVParser();
         return parser;
+    }
+
+    @Bean
+    public URL mtgoCollectionUrl() {
+        File collectionFile = new File(environment.getRequiredProperty("mtgo.collection.file.path"));
+
+        try {
+            URL[] shouldBeOne = FileUtils.toURLs(new File[] { collectionFile });
+
+            if(shouldBeOne.length == 1) {
+                return shouldBeOne[0];
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
 
