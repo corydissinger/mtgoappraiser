@@ -9,6 +9,15 @@ public class Card {
     private String set;
     private boolean isPremium;
 
+    public Card() {}
+
+    public Card(Card aCard) {
+        this.setName(aCard.getName());
+        this.setQuantity(aCard.getQuantity());
+        this.setSet(aCard.getSet());
+        this.setPremium(aCard.isPremium());
+    }
+
     public Integer getQuantity() {
         return quantity;
     }
@@ -41,4 +50,17 @@ public class Card {
         this.name = name;
     }
 
+    public boolean equals(Card right) {
+        return this.getName().equals(right.getName());
+    }
+
+    @Override
+    public boolean equals(Object right) {
+        if(right instanceof Card) {
+            if(this.name.equals(((Card) right).getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -14,21 +14,28 @@ import java.util.List;
 /**
  * Created by Cory on 8/14/2016.
  */
-@Service("csvProducer")
 public class CsvProducer {
 
-    private String outputDirectory;
+    private String outputFile;
+    private String mtgGoldfishBaseUrl;
 
     public void printAppraisedCards(List<AppraisedCard> appraisedCards) {
         FileWriter writer;
 
         try {
-            writer = new FileWriter(new File(outputDirectory));
-            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.RFC4180);
+            File outputCsv = new File(outputFile);
+
+            if(!outputCsv.exists()) {
+                outputCsv.getParentFile().mkdirs();
+                outputCsv.createNewFile();
+            }
+
+            writer = new FileWriter(outputCsv);
+            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.RFC4180.withHeader("Name", "Set", "Quantity", "RetailPrice", "SumPrice", "Link"));
 
             appraisedCards.stream().forEach(appraisedCard -> {
                 try {
-                    printer.printRecord(appraisedCard);
+                    printer.printRecord(appraisedCard.getName(), appraisedCard.getSet(), appraisedCard.getQuantity(), appraisedCard.getRetailPrice(), appraisedCard.getSumPrice(), mtgGoldfishBaseUrl + appraisedCard.getLink());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -39,10 +46,9 @@ public class CsvProducer {
         }
     }
 
-    public void setOutputDirectory(String outputDirectory) {
-        this.outputDirectory = outputDirectory;
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
     }
 
-
-
+    public void setMtgGoldfishBaseUrl(String mtgGoldfishBaseUrl) { this.mtgGoldfishBaseUrl = mtgGoldfishBaseUrl; }
 }

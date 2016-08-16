@@ -1,6 +1,5 @@
 package com.cd.mtgoappraiser.config;
 
-import com.cd.mtgoappraiser.appraiser.CollectionAppraiser;
 import com.cd.mtgoappraiser.csv.CsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
@@ -32,18 +31,10 @@ public class AppraiserConfig {
     public CsvProducer csvProducer() {
         CsvProducer csvProducer = new CsvProducer();
 
-        csvProducer.setOutputDirectory(environment.getRequiredProperty("output.file.path"));
+        csvProducer.setOutputFile(environment.getRequiredProperty("output.file.path"));
+        csvProducer.setMtgGoldfishBaseUrl(environment.getRequiredProperty("mtggoldfish.base.url"));
 
         return csvProducer;
-    }
-
-    @Bean
-    public CollectionAppraiser collectionAppraiser() {
-        CollectionAppraiser collectionAppraiser = new CollectionAppraiser();
-
-        collectionAppraiser.setCsvProducer(csvProducer());
-
-        return collectionAppraiser;
     }
 
     @Bean

@@ -27,8 +27,12 @@ public class MtgGoldfishIndexParser {
         List<MtgGoldfishCard> parsedCards = cardsInFormat.stream().map(rawCard -> {
             MtgGoldfishCard parsedCard = new MtgGoldfishCard();
 
-            parsedCard.setName(rawCard.select("td.card > a").text());
+            Element cardElement = rawCard.select("td.card > a").first();
+
+            parsedCard.setName(cardElement.text());
+            parsedCard.setLink(cardElement.attr("href"));
             parsedCard.setRetailPrice(Double.parseDouble(rawCard.select("td.text-right").first().text()));
+
 
             return parsedCard;
         }).collect((Collectors.toCollection(ArrayList::new)));
