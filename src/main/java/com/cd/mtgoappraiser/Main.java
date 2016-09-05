@@ -52,20 +52,5 @@ public class Main {
         csvProducer.printAppraisedCards(appraisedCards);
 
         System.exit(0);
-        /*
-        Function<String, List<Card>> urlToCards = new Function<String, List<Card>>() {
-            public List<Card> apply(String url) {
-                return mtgGoldfishIndexParser.getCardsFromPage(url);
-            }
-        };
-
-        try {
-            List<Card> allCardsAndPrices = mtgGoldfishIndexParser.getIndexUrls()
-                    .stream()
-                    .map(indexUrl -> urlToCards.apply(indexUrl))
-                    .collect(Collectors.toList());
-        } catch(Exception e) {
-            e.printStackTrace();
-        }*/
     }
 }
