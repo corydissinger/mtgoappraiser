@@ -245,7 +245,8 @@
 							<tasks>
 								<copy todir="${project.build.directory}/staging">
 									<fileset dir="${basedir}">
-										<include name="**/src/main/resources/application.properties"/>
+										<include name="**/src/main/resources/*.properties"/>
+										<include name="**/src/main/resources/*.bat"/>
 									</fileset>
 									<flattenmapper/>
 								</copy>
@@ -259,6 +260,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>make-jar-with-deps</id> <!-- this is used for inheritance merges -->

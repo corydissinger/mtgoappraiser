@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +36,7 @@ public class MtgGoldfishIndexParser {
 
 
             return parsedCard;
-        }).collect((Collectors.toCollection(ArrayList::new)));
+        }).collect((Collectors.toList()));
 
         return parsedCards;
     }

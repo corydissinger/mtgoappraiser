@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Cory on 8/10/2016.

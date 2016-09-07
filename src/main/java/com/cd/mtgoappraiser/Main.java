@@ -11,8 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,23 +30,29 @@ public class Main {
 
         List<String> indexUrls = mtgGoldfishIndexRequestor.getIndexUrls();
 
-        List<AppraisedCard> appraisedCards = new ArrayList<>();
+        //A little wonky. Extrapolated from here - http://stackoverflow.com/questions/31706699/combine-stream-of-collections-into-one-collection-java-8
+        List<MtgGoldfishCard> marketCards = indexUrls.stream().map(indexUrl -> mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl))
+                                                              .flatMap(Collection::stream)
+                                                              .collect(Collectors.toList());
 
-        indexUrls.stream().forEach(indexUrl -> {
-            List<MtgGoldfishCard> marketCards = mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl);
+        //Remove duplicates since many of the indices will contain duplicates
+        Set<MtgGoldfishCard> marketCardsSet = new HashSet<>(marketCards);
 
-            appraisedCards.addAll(marketCards.stream()
-                    .filter(marketCard -> rawCards.contains(marketCard))
-                    .map(marketCard -> {
-                marketCard.setQuantity(rawCards.get(rawCards.indexOf(marketCard)).getQuantity());
+        //Create a list of appraised cards, basically involves cross referencing the cards from
+        //the original CSV and slapping a quantity on them
+        List<AppraisedCard> appraisedCards = marketCardsSet.stream()
+                .filter(marketCard -> rawCards.contains(marketCard))
+                .map(marketCard -> {
+            marketCard.setQuantity(rawCards.get(rawCards.indexOf(marketCard)).getQuantity());
 
-                AppraisedCard appraisedCard = new AppraisedCard(marketCard);
+            AppraisedCard appraisedCard = new AppraisedCard(marketCard);
 
-                appraisedCard.setSumPrice(appraisedCard.getRetailPrice() * appraisedCard.getQuantity());
+            appraisedCard.setSumPrice(appraisedCard.getRetailPrice() * appraisedCard.getQuantity());
 
-                return appraisedCard;
-            }).collect(Collectors.toCollection(ArrayList::new)));
-        });
+            return appraisedCard;
+        }).collect(Collectors.toCollection(ArrayList::new));
+
+        appraisedCards.sort(new AppraisedCard.AppraisedCardComparator());
 
         csvProducer.printAppraisedCards(appraisedCards);
 

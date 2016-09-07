@@ -1,5 +1,7 @@
 package com.cd.mtgoappraiser.model;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Created by Cory on 8/10/2016.
  */
@@ -43,5 +45,17 @@ public class MtgGoldfishCard extends Card {
 
     public boolean equals(MtgGoldfishCard right) {
         return super.equals(right);
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder(1, 3)
+                .append(this.buyPrice)
+                .append(this.link)
+                .append(this.retailPrice)
+                .append(getSet())
+                .append(getName())
+                .append(getQuantity())
+                .append(isPremium())
+                .toHashCode();
     }
 }
