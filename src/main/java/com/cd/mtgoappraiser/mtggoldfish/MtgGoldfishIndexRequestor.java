@@ -2,16 +2,17 @@ package com.cd.mtgoappraiser.mtggoldfish;
 
 import com.cd.mtgoappraiser.model.MtgGoldfishCard;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Cory on 8/10/2016.
@@ -51,11 +52,24 @@ public class MtgGoldfishIndexRequestor {
     private Document loadFromCache(String pageUrl) throws Exception {
         String tempFileName = getTempFileName(pageUrl);
 
+        final boolean shouldLoadFromCache;
+
         File formatCache = new File(cacheFolder + File.separator + tempFileName);
+
+        if(formatCache.exists()) {
+            BasicFileAttributes fileAttributes = Files.readAttributes(formatCache.toPath(), BasicFileAttributes.class);
+            FileTime lastModified = fileAttributes.lastModifiedTime();
+            Instant lastModifiedInstant = lastModified.toInstant();
+            Instant oneDayAgo = Instant.now().minus(24, ChronoUnit.HOURS);
+
+            shouldLoadFromCache = lastModifiedInstant.isAfter(oneDayAgo);
+        } else {
+            shouldLoadFromCache = false;
+        }
 
         Document theHtml;
 
-        if (formatCache.exists()) {
+        if (shouldLoadFromCache) {
             theHtml = Jsoup.parse(FileUtils.readFileToString(formatCache));
         } else {
             theHtml = Jsoup.connect(pageUrl).get();
@@ -76,11 +90,7 @@ public class MtgGoldfishIndexRequestor {
             theFormat = theFormat.substring(0, theFormat.indexOf("#"));
         }
 
-        LocalDate date = LocalDate.now();
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("MMddyyyy");
-        String todayString = date.toString(fmt);
-
-        return theFormat + todayString;
+        return theFormat;
     }
 
     public void setCacheFolder(File cacheFolder) {
