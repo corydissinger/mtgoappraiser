@@ -8,10 +8,10 @@ import java.util.Comparator;
 /**
  * Created by Cory on 8/12/2016.
  */
-public class AppraisedCard extends MtgGoldfishCard {
+public class AppraisedCard extends MarketCard {
     private Double sumPrice;
 
-    public AppraisedCard(MtgGoldfishCard aCard) {
+    public AppraisedCard(MarketCard aCard) {
         super(aCard);
     }
 

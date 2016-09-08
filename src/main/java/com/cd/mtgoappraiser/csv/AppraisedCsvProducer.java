@@ -3,8 +3,6 @@ package com.cd.mtgoappraiser.csv;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.io.FileUtils;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +12,7 @@ import java.util.List;
 /**
  * Created by Cory on 8/14/2016.
  */
-public class CsvProducer {
+public class AppraisedCsvProducer {
 
     private String outputFile;
     private String mtgGoldfishBaseUrl;

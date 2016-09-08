@@ -1,12 +1,10 @@
-package com.cd.mtgoappraiser.mtggoldfish;
+package com.cd.mtgoappraiser.http.mtggoldfish;
 
-import com.cd.mtgoappraiser.model.MtgGoldfishCard;
+import com.cd.mtgoappraiser.model.MarketCard;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -22,11 +20,11 @@ public class MtgGoldfishIndexParser {
         return indexUrls;
     }
 
-    public List<MtgGoldfishCard> getCardsFromPage(Document theHtml) {
+    public List<MarketCard> getCardsFromPage(Document theHtml) {
         List<Element> cardsInFormat = theHtml.select("body > div.container-fluid.layout-container-fluid > div.index-price-table > div.index-price-table-online > table > tbody > tr");
 
-        List<MtgGoldfishCard> parsedCards = cardsInFormat.stream().map(rawCard -> {
-            MtgGoldfishCard parsedCard = new MtgGoldfishCard();
+        List<MarketCard> parsedCards = cardsInFormat.stream().map(rawCard -> {
+            MarketCard parsedCard = new MarketCard();
 
             Element cardElement = rawCard.select("td.card > a").first();
 

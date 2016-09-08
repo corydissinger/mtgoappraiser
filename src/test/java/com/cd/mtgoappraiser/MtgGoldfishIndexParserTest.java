@@ -1,7 +1,7 @@
 package com.cd.mtgoappraiser;
 
-import com.cd.mtgoappraiser.model.MtgGoldfishCard;
-import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
+import com.cd.mtgoappraiser.model.MarketCard;
+import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
@@ -17,7 +17,6 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
@@ -61,7 +60,7 @@ public class MtgGoldfishIndexParserTest {
 
         Document theHtml = Jsoup.parse(theCards, "UTF-8", "");
 
-        List<MtgGoldfishCard> cards = mtgoGoldfishIndexParser.getCardsFromPage(theHtml);
+        List<MarketCard> cards = mtgoGoldfishIndexParser.getCardsFromPage(theHtml);
 
         assertTrue(cards != null);
         assertTrue(cards.size() == 404);

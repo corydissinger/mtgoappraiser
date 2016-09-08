@@ -1,9 +1,12 @@
 package com.cd.mtgoappraiser.config;
 
-import com.cd.mtgoappraiser.csv.CsvProducer;
+import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
-import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexParser;
-import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexRequestor;
+import com.cd.mtgoappraiser.http.JsoupCacheManager;
+import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexParser;
+import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
+import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -28,20 +31,45 @@ public class AppraiserConfig {
     private Environment environment;
 
     @Bean
-    public CsvProducer csvProducer() {
-        CsvProducer csvProducer = new CsvProducer();
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
-        csvProducer.setOutputFile(environment.getRequiredProperty("output.file.path"));
-        csvProducer.setMtgGoldfishBaseUrl(environment.getRequiredProperty("mtggoldfish.base.url"));
+    @Bean
+    public JsoupCacheManager jsoupCacheManager() {
+        JsoupCacheManager jsoupCacheManager = new JsoupCacheManager();
 
-        return csvProducer;
+        jsoupCacheManager.setCacheFolder(new File(environment.getRequiredProperty("cache.file.path")));
+
+        return jsoupCacheManager;
+    }
+
+    @Bean
+    public MtgoTradersHotListParser mtgoTradersHotListParser() {
+        MtgoTradersHotListParser mtgoTradersHotListParser = new MtgoTradersHotListParser();
+
+        mtgoTradersHotListParser.setMtgoTradersBaseUrl(environment.getRequiredProperty("mtgotraders.base.url"));
+        mtgoTradersHotListParser.setJsoupCacheManager(jsoupCacheManager());
+        mtgoTradersHotListParser.setObjectMapper(objectMapper());
+
+        return mtgoTradersHotListParser;
+    }
+
+    @Bean
+    public AppraisedCsvProducer appraisedCsvProducer() {
+        AppraisedCsvProducer appraisedCsvProducer = new AppraisedCsvProducer();
+
+        appraisedCsvProducer.setOutputFile(environment.getRequiredProperty("output.file.path"));
+        appraisedCsvProducer.setMtgGoldfishBaseUrl(environment.getRequiredProperty("mtggoldfish.base.url"));
+
+        return appraisedCsvProducer;
     }
 
     @Bean
     public MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor() {
         MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = new MtgGoldfishIndexRequestor();
 
-        mtgGoldfishIndexRequestor.setCacheFolder(new File(environment.getRequiredProperty("cache.file.path")));
+        mtgGoldfishIndexRequestor.setJsoupCacheManager(jsoupCacheManager());
         mtgGoldfishIndexRequestor.setMtgoGoldfishBaseUrl(environment.getRequiredProperty("mtggoldfish.base.url"));
         mtgGoldfishIndexRequestor.setMtgGoldfishIndexParser(mtgGoldfishIndexParser());
 

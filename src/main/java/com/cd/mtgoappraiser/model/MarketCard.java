@@ -5,14 +5,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * Created by Cory on 8/10/2016.
  */
-public class MtgGoldfishCard extends Card {
+public class MarketCard extends Card {
     private Double retailPrice;
     private Double buyPrice;
     private String link;
 
-    public MtgGoldfishCard() {}
+    public MarketCard() {}
 
-    public MtgGoldfishCard(MtgGoldfishCard aCard) {
+    public MarketCard(MarketCard aCard) {
         super(aCard);
         this.setRetailPrice(aCard.getRetailPrice());
         this.setBuyPrice(aCard.getBuyPrice());
@@ -43,7 +43,7 @@ public class MtgGoldfishCard extends Card {
         this.link = link;
     }
 
-    public boolean equals(MtgGoldfishCard right) {
+    public boolean equals(MarketCard right) {
         return super.equals(right);
     }
 

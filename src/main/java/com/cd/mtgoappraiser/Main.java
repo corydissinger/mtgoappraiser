@@ -1,12 +1,13 @@
 package com.cd.mtgoappraiser;
 
 import com.cd.mtgoappraiser.config.AppraiserConfig;
-import com.cd.mtgoappraiser.csv.CsvProducer;
+import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
+import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import com.cd.mtgoappraiser.model.Card;
-import com.cd.mtgoappraiser.model.MtgGoldfishCard;
-import com.cd.mtgoappraiser.mtggoldfish.MtgGoldfishIndexRequestor;
+import com.cd.mtgoappraiser.model.MarketCard;
+import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -23,7 +24,11 @@ public class Main {
 
         MtgoCSVParser mtgoCsvParser = (MtgoCSVParser) applicationContext.getBean("mtgoCsvParser");
         MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = (MtgGoldfishIndexRequestor) applicationContext.getBean("mtgGoldfishIndexRequestor");
-        CsvProducer csvProducer = (CsvProducer) applicationContext.getBean("csvProducer");
+        AppraisedCsvProducer appraisedCsvProducer = (AppraisedCsvProducer) applicationContext.getBean("appraisedCsvProducer");
+        MtgoTradersHotListParser mtgoTradersHotListParser = (MtgoTradersHotListParser) applicationContext.getBean("mtgoTradersHotListParser");
+
+        mtgoTradersHotListParser.getHotBuyListCards();
+
         URL mtgoCollectionUrl = (URL) applicationContext.getBean("mtgoCollectionUrl");
 
         List<Card> rawCards = mtgoCsvParser.getCards(mtgoCollectionUrl);
@@ -31,12 +36,12 @@ public class Main {
         List<String> indexUrls = mtgGoldfishIndexRequestor.getIndexUrls();
 
         //A little wonky. Extrapolated from here - http://stackoverflow.com/questions/31706699/combine-stream-of-collections-into-one-collection-java-8
-        List<MtgGoldfishCard> marketCards = indexUrls.stream().map(indexUrl -> mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl))
+        List<MarketCard> marketCards = indexUrls.stream().map(indexUrl -> mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl))
                                                               .flatMap(Collection::stream)
                                                               .collect(Collectors.toList());
 
         //Remove duplicates since many of the indices will contain duplicates
-        Set<MtgGoldfishCard> marketCardsSet = new HashSet<>(marketCards);
+        Set<MarketCard> marketCardsSet = new HashSet<>(marketCards);
 
         //Create a list of appraised cards, basically involves cross referencing the cards from
         //the original CSV and slapping a quantity on them
@@ -54,7 +59,7 @@ public class Main {
 
         appraisedCards.sort(new AppraisedCard.AppraisedCardComparator());
 
-        csvProducer.printAppraisedCards(appraisedCards);
+        appraisedCsvProducer.printAppraisedCards(appraisedCards);
 
         System.exit(0);
     }
