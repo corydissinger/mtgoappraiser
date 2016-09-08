@@ -1,0 +1,2 @@
+@REM debug java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 mtgo-appraiser-jar-with-dependencies.jar
+java -jar -Dlog4j.configuration=file:.\log4j.properties mtgo-appraiser-jar-with-dependencies.jar
