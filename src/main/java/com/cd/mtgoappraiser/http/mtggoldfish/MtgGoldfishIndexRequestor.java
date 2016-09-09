@@ -2,16 +2,8 @@ package com.cd.mtgoappraiser.http.mtggoldfish;
 
 import com.cd.mtgoappraiser.http.JsoupCacheManager;
 import com.cd.mtgoappraiser.model.MarketCard;
-import org.apache.commons.io.FileUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +33,7 @@ public class MtgGoldfishIndexRequestor {
         Document theHtml;
 
         try {
+
             theHtml = jsoupCacheManager.loadFromCache(mtgoGoldfishBaseUrl + pageUrl + "#online");
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,8 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * Created by Cory on 8/10/2016.
  */
 public class MarketCard extends Card {
-    private Double retailPrice;
-    private Double buyPrice;
+    private Double retailPrice  = 0.0;
+    private Double buyPrice = 0.0;
     private String link;
 
     public MarketCard() {}

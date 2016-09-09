@@ -10,6 +10,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Cory on 9/8/2016.
@@ -51,6 +52,10 @@ public class JsoupCacheManager {
         if (shouldLoadFromCache) {
             theHtml = Jsoup.parse(FileUtils.readFileToString(formatCache));
         } else {
+            //Sleep so that our requesting doesn't look as robotic...
+            System.out.println("Need to request: " + pageUrl);
+            System.out.println("Sleeping for a ~second so we appear less bot like.");
+            Thread.sleep(ThreadLocalRandom.current().nextInt(700, 1301));
             theHtml = Jsoup.connect(pageUrl).get();
             FileUtils.write(formatCache, theHtml.toString());
         }

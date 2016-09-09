@@ -240,6 +240,7 @@
 									<fileset dir="${basedir}">
 										<include name="**/src/main/resources/*.properties"/>
 										<include name="**/src/main/resources/*.bat"/>
+										<include name="**/src/main/resources/*.md"/>
 									</fileset>
 									<flattenmapper/>
 								</copy>

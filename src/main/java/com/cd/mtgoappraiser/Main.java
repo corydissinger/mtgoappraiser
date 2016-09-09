@@ -20,39 +20,46 @@ import java.util.stream.Collectors;
  */
 public class Main {
     public static void main(String [] args) {
+        System.out.println("Starting mtgoappraiser...");
+        //Setup spring context and load beans
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppraiserConfig.class);
 
         MtgoCSVParser mtgoCsvParser = (MtgoCSVParser) applicationContext.getBean("mtgoCsvParser");
         MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = (MtgGoldfishIndexRequestor) applicationContext.getBean("mtgGoldfishIndexRequestor");
         AppraisedCsvProducer appraisedCsvProducer = (AppraisedCsvProducer) applicationContext.getBean("appraisedCsvProducer");
         MtgoTradersHotListParser mtgoTradersHotListParser = (MtgoTradersHotListParser) applicationContext.getBean("mtgoTradersHotListParser");
-
-        mtgoTradersHotListParser.getHotBuyListCards();
-
         URL mtgoCollectionUrl = (URL) applicationContext.getBean("mtgoCollectionUrl");
+        //End spring setup
 
         List<Card> rawCards = mtgoCsvParser.getCards(mtgoCollectionUrl);
 
         List<String> indexUrls = mtgGoldfishIndexRequestor.getIndexUrls();
 
-        //A little wonky. Extrapolated from here - http://stackoverflow.com/questions/31706699/combine-stream-of-collections-into-one-collection-java-8
-        List<MarketCard> marketCards = indexUrls.stream().map(indexUrl -> mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl))
+        //A little wonky. Simplest way I could figure out how to combine a list of lists from here - http://stackoverflow.com/questions/31706699/combine-stream-of-collections-into-one-collection-java-8
+        List<MarketCard> mtgGoldfishRetailCards = indexUrls.stream()
+                                                              .map(indexUrl -> mtgGoldfishIndexRequestor.getCardsFromPage(indexUrl))
                                                               .flatMap(Collection::stream)
                                                               .collect(Collectors.toList());
 
-        //Remove duplicates since many of the indices will contain duplicates
-        Set<MarketCard> marketCardsSet = new HashSet<>(marketCards);
+        //Remove duplicates since many of the indices from mtggoldfish will contain duplicates
+        Set<MarketCard> mtgGoldfishRetailCardsSet = new HashSet<>(mtgGoldfishRetailCards);
+
+        List<MarketCard> mtgoTradersBuylistCards = mtgoTradersHotListParser.getHotBuyListCards();
 
         //Create a list of appraised cards, basically involves cross referencing the cards from
         //the original CSV and slapping a quantity on them
-        List<AppraisedCard> appraisedCards = marketCardsSet.stream()
+        List<AppraisedCard> appraisedCards = mtgGoldfishRetailCardsSet.stream()
                 .filter(marketCard -> rawCards.contains(marketCard))
                 .map(marketCard -> {
-            marketCard.setQuantity(rawCards.get(rawCards.indexOf(marketCard)).getQuantity());
-
             AppraisedCard appraisedCard = new AppraisedCard(marketCard);
 
-            appraisedCard.setSumPrice(appraisedCard.getRetailPrice() * appraisedCard.getQuantity());
+            appraisedCard.setQuantity(rawCards.get(rawCards.indexOf(marketCard)).getQuantity());
+
+            int indexOfHotBuyCard = mtgoTradersBuylistCards.indexOf(marketCard);
+
+            if(indexOfHotBuyCard > -1) {
+                appraisedCard.setMtgoTradersBuyPrice(mtgoTradersBuylistCards.get(indexOfHotBuyCard).getBuyPrice());
+            }
 
             return appraisedCard;
         }).collect(Collectors.toCollection(ArrayList::new));
@@ -61,6 +68,7 @@ public class Main {
 
         appraisedCsvProducer.printAppraisedCards(appraisedCards);
 
+        System.out.println("All done.");
         System.exit(0);
     }
 }

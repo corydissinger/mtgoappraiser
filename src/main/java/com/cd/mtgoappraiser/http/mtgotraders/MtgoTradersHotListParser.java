@@ -51,8 +51,19 @@ public class MtgoTradersHotListParser {
         return allCards.stream().map(jsonCard -> {
             MarketCard marketCard = new MarketCard();
 
+            String cleanedName;
+            String rawName = jsonCard.getName();
+
+            if(rawName.contains("*Foil*")) {
+                int badFoilStringStart = rawName.indexOf("*Foil*");
+                rawName = rawName.substring(0, badFoilStringStart);
+                cleanedName = rawName.trim();
+            } else {
+                cleanedName = rawName;
+            }
+
             marketCard.setBuyPrice(jsonCard.getPrice());
-            marketCard.setName(jsonCard.getName());
+            marketCard.setName(cleanedName);
             marketCard.setPremium("Prem".equals(jsonCard.getVerison()));
             marketCard.setSet(jsonCard.getSetshort());
 

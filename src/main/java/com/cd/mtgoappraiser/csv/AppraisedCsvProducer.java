@@ -29,15 +29,27 @@ public class AppraisedCsvProducer {
             }
 
             writer = new FileWriter(outputCsv);
-            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.RFC4180.withHeader("Name", "Set", "Quantity", "RetailPrice", "SumPrice", "Link"));
+            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.RFC4180.withHeader("Name",
+                                                                                     "Set",
+                                                                                     "Quantity",
+                                                                                     "MTGGoldfishRetailAggregate",
+                                                                                     "MTGOTradersHotBuyListPrice",
+                                                                                     "MTGGoldfishLink"));
 
             appraisedCards.stream().forEach(appraisedCard -> {
                 try {
-                    printer.printRecord(appraisedCard.getName(), appraisedCard.getSet(), appraisedCard.getQuantity(), appraisedCard.getRetailPrice(), appraisedCard.getSumPrice(), mtgGoldfishBaseUrl + appraisedCard.getLink());
+                    printer.printRecord(appraisedCard.getName(),
+                                        appraisedCard.getSet(),
+                                        appraisedCard.getQuantity(),
+                                        appraisedCard.getMtgGoldfishRetailAggregate(),
+                                        appraisedCard.getMtgoTradersBuyPrice(),
+                                        mtgGoldfishBaseUrl + appraisedCard.getLink());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
+
+            System.out.println("Created appraised collection here: " + outputFile);
         } catch (IOException e) {
             e.printStackTrace();
             return;

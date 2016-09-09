@@ -8,28 +8,79 @@ import java.util.Comparator;
 /**
  * Created by Cory on 8/12/2016.
  */
-public class AppraisedCard extends MarketCard {
-    private Double sumPrice;
+public class AppraisedCard {
+    private Double mtgGoldfishRetailAggregate;
+    private Double mtgoTradersBuyPrice;
+    private String link;
+    private String name;
+    private Integer quantity;
+    private String set;
+    private boolean isPremium;
 
     public AppraisedCard(MarketCard aCard) {
-        super(aCard);
+        this.setName(aCard.getName());
+        this.setQuantity(aCard.getQuantity());
+        this.setSet(aCard.getSet());
+        this.setPremium(aCard.isPremium());
+        this.setMtgGoldfishRetailAggregate(aCard.getRetailPrice());
+        this.setMtgoTradersBuyPrice(aCard.getBuyPrice());
+        this.setLink(aCard.getLink());
     }
 
-    public AppraisedCard(AppraisedCard aCard) {
-        super(aCard);
-        this.setSumPrice(aCard.getSumPrice());
+    public Double getMtgGoldfishRetailAggregate() {
+        return mtgGoldfishRetailAggregate;
     }
 
-    public Double getSumPrice() {
-        return sumPrice;
+    public void setMtgGoldfishRetailAggregate(Double mtgGoldfishRetailAggregate) {
+        this.mtgGoldfishRetailAggregate = mtgGoldfishRetailAggregate;
     }
 
-    public void setSumPrice(Double sumPrice) {
-        this.sumPrice = sumPrice;
+    public Double getMtgoTradersBuyPrice() {
+        return mtgoTradersBuyPrice;
     }
 
-    public boolean equals(AppraisedCard right) {
-        return super.equals(right);
+    public void setMtgoTradersBuyPrice(Double mtgoTradersBuyPrice) {
+        this.mtgoTradersBuyPrice = mtgoTradersBuyPrice;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getSet() {
+        return set;
+    }
+
+    public void setSet(String set) {
+        this.set = set;
+    }
+
+    public boolean isPremium() {
+        return isPremium;
+    }
+
+    public void setPremium(boolean premium) {
+        isPremium = premium;
     }
 
     public String toString() {
@@ -40,9 +91,9 @@ public class AppraisedCard extends MarketCard {
 
         @Override
         public int compare(AppraisedCard left, AppraisedCard right) {
-            if(left.getRetailPrice() > right.getRetailPrice()) {
+            if(left.getMtgGoldfishRetailAggregate() > right.getMtgGoldfishRetailAggregate()) {
                 return -1;
-            } else if (left.getRetailPrice() < right.getRetailPrice()) {
+            } else if (left.getMtgGoldfishRetailAggregate() < right.getMtgGoldfishRetailAggregate()) {
                 return 1;
             } else {
                 return left.getName().compareToIgnoreCase(right.getName());
