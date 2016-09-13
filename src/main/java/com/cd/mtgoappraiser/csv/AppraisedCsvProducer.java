@@ -18,7 +18,8 @@ public class AppraisedCsvProducer {
     private String mtgGoldfishBaseUrl;
 
     public void printAppraisedCards(List<AppraisedCard> appraisedCards) {
-        FileWriter writer;
+        FileWriter writer = null;
+        CSVPrinter printer = null;
 
         try {
             File outputCsv = new File(outputFile);
@@ -29,30 +30,41 @@ public class AppraisedCsvProducer {
             }
 
             writer = new FileWriter(outputCsv);
-            CSVPrinter printer = new CSVPrinter(writer, CSVFormat.RFC4180.withHeader("Name",
-                                                                                     "Set",
-                                                                                     "Quantity",
-                                                                                     "MTGGoldfishRetailAggregate",
-                                                                                     "MTGOTradersHotBuyListPrice",
-                                                                                     "MTGGoldfishLink"));
+            printer = new CSVPrinter(writer, CSVFormat.EXCEL.withHeader("Name",
+                                                                         "Set",
+                                                                         "Quantity",
+                                                                         "Premium",
+                                                                         "MTGGoldfishRetailAggregate",
+                                                                         "MTGOTradersHotBuyListPrice",
+                                                                         "MTGGoldfishLink"));
 
-            appraisedCards.stream().forEach(appraisedCard -> {
+            for(AppraisedCard appraisedCard : appraisedCards) {
                 try {
                     printer.printRecord(appraisedCard.getName(),
                                         appraisedCard.getSet(),
                                         appraisedCard.getQuantity(),
+                                        appraisedCard.isPremium() ? "Yes" : "No",
                                         appraisedCard.getMtgGoldfishRetailAggregate(),
                                         appraisedCard.getMtgoTradersBuyPrice(),
-                                        mtgGoldfishBaseUrl + appraisedCard.getLink());
+                                        appraisedCard.getLink() != null ? mtgGoldfishBaseUrl + appraisedCard.getLink() : "NA");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            });
+            }
 
             System.out.println("Created appraised collection here: " + outputFile);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
+        } finally {
+            try {
+                if(writer != null && printer != null) {
+                    writer.flush();
+                    writer.close();
+                    printer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

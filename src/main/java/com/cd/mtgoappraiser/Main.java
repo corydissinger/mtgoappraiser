@@ -13,6 +13,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.net.URL;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,13 +50,16 @@ public class Main {
         //Create a list of appraised cards, basically involves cross referencing the cards from
         //the original CSV and slapping a quantity on them
         List<AppraisedCard> appraisedCards = mtgGoldfishRetailCardsSet.stream()
-                .filter(marketCard -> rawCards.contains(marketCard))
-                .map(marketCard -> {
-            AppraisedCard appraisedCard = new AppraisedCard(marketCard);
+                .filter(mtgGoldfishMarketCard -> rawCards.contains(mtgGoldfishMarketCard))
+                .map(mtgGoldfishMarketCard -> {
+            AppraisedCard appraisedCard = new AppraisedCard(mtgGoldfishMarketCard);
 
-            appraisedCard.setQuantity(rawCards.get(rawCards.indexOf(marketCard)).getQuantity());
+            Card aRawCard = rawCards.get(rawCards.indexOf(mtgGoldfishMarketCard));
 
-            int indexOfHotBuyCard = mtgoTradersBuylistCards.indexOf(marketCard);
+            appraisedCard.setQuantity(aRawCard.getQuantity());
+            appraisedCard.setSet(aRawCard.getSet());
+
+            int indexOfHotBuyCard = mtgoTradersBuylistCards.indexOf(mtgGoldfishMarketCard);
 
             if(indexOfHotBuyCard > -1) {
                 appraisedCard.setMtgoTradersBuyPrice(mtgoTradersBuylistCards.get(indexOfHotBuyCard).getBuyPrice());
@@ -63,6 +67,22 @@ public class Main {
 
             return appraisedCard;
         }).collect(Collectors.toCollection(ArrayList::new));
+
+        //This will catch in-demand foils. Both of these streams should be refactored, they're bad
+        //This also misses retail from MTGGoldFish, but they don't really provide retail for foils easily anyway
+        appraisedCards.addAll(mtgoTradersBuylistCards.stream()
+                .filter(mtgoTradersBuylistCard -> (mtgoTradersBuylistCard.isPremium() && rawCards.contains(mtgoTradersBuylistCard)))
+                .map(mtgoTradersBuylistCard -> {
+                    AppraisedCard appraisedCard = new AppraisedCard(mtgoTradersBuylistCard);
+
+                    Card aRawCard = rawCards.get(rawCards.indexOf(mtgoTradersBuylistCard));
+
+                    appraisedCard.setQuantity(aRawCard.getQuantity());
+                    appraisedCard.setSet(aRawCard.getSet());
+                    appraisedCard.setMtgoTradersBuyPrice(mtgoTradersBuylistCard.getBuyPrice());
+
+                    return appraisedCard;
+                }).collect(Collectors.toCollection(ArrayList::new)));
 
         appraisedCards.sort(new AppraisedCard.AppraisedCardComparator());
 

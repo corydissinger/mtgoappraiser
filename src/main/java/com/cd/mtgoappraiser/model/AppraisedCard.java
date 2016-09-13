@@ -9,8 +9,8 @@ import java.util.Comparator;
  * Created by Cory on 8/12/2016.
  */
 public class AppraisedCard {
-    private Double mtgGoldfishRetailAggregate;
-    private Double mtgoTradersBuyPrice;
+    private Double mtgGoldfishRetailAggregate = 0.0;
+    private Double mtgoTradersBuyPrice = 0.0;
     private String link;
     private String name;
     private Integer quantity;
@@ -91,9 +91,9 @@ public class AppraisedCard {
 
         @Override
         public int compare(AppraisedCard left, AppraisedCard right) {
-            if(left.getMtgGoldfishRetailAggregate() > right.getMtgGoldfishRetailAggregate()) {
+            if(left.getMtgoTradersBuyPrice() > right.getMtgoTradersBuyPrice()) {
                 return -1;
-            } else if (left.getMtgGoldfishRetailAggregate() < right.getMtgGoldfishRetailAggregate()) {
+            } else if (left.getMtgoTradersBuyPrice() < right.getMtgoTradersBuyPrice()) {
                 return 1;
             } else {
                 return left.getName().compareToIgnoreCase(right.getName());

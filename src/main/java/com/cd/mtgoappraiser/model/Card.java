@@ -50,14 +50,11 @@ public class Card {
         this.name = name;
     }
 
-    public boolean equals(Card right) {
-        return this.getName().equals(right.getName());
-    }
-
     @Override
     public boolean equals(Object right) {
         if(right instanceof Card) {
-            if(this.name.equals(((Card) right).getName())) {
+            if(this.name.equals(((Card) right).getName())
+                && this.isPremium == ((Card) right).isPremium()) {
                 return true;
             }
         }

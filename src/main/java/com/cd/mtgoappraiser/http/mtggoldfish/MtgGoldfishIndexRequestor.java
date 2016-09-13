@@ -33,7 +33,6 @@ public class MtgGoldfishIndexRequestor {
         Document theHtml;
 
         try {
-
             theHtml = jsoupCacheManager.loadFromCache(mtgoGoldfishBaseUrl + pageUrl + "#online");
         } catch (Exception e) {
             e.printStackTrace();
