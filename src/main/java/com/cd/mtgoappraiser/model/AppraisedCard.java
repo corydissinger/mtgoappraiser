@@ -86,18 +86,4 @@ public class AppraisedCard {
     public String toString() {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SIMPLE_STYLE);
     }
-
-    public static class AppraisedCardComparator implements Comparator<AppraisedCard> {
-
-        @Override
-        public int compare(AppraisedCard left, AppraisedCard right) {
-            if(left.getMtgoTradersBuyPrice() > right.getMtgoTradersBuyPrice()) {
-                return -1;
-            } else if (left.getMtgoTradersBuyPrice() < right.getMtgoTradersBuyPrice()) {
-                return 1;
-            } else {
-                return left.getName().compareToIgnoreCase(right.getName());
-            }
-        }
-    }
 }

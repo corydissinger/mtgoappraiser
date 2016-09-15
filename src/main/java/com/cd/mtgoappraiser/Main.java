@@ -84,7 +84,9 @@ public class Main {
                     return appraisedCard;
                 }).collect(Collectors.toCollection(ArrayList::new)));
 
-        appraisedCards.sort(new AppraisedCard.AppraisedCardComparator());
+        appraisedCards.sort(Comparator.comparing(AppraisedCard::getName));
+        appraisedCards.sort(Comparator.comparing(AppraisedCard::getMtgGoldfishRetailAggregate).reversed());
+        appraisedCards.sort(Comparator.comparing(AppraisedCard::getMtgoTradersBuyPrice).reversed());
 
         appraisedCsvProducer.printAppraisedCards(appraisedCards);
 
