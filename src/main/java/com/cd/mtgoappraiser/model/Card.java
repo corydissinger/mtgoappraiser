@@ -53,8 +53,10 @@ public class Card {
     @Override
     public boolean equals(Object right) {
         if(right instanceof Card) {
-            if(this.name.equals(((Card) right).getName())
-                && this.isPremium == ((Card) right).isPremium()) {
+            final Card theRight = (Card) right;
+            if(this.name.equals(theRight.getName())
+                && this.set.equals(theRight.getSet())
+                && this.isPremium == theRight.isPremium()) {
                 return true;
             }
         }

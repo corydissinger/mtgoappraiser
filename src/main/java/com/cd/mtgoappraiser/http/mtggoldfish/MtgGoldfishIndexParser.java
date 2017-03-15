@@ -28,7 +28,10 @@ public class MtgGoldfishIndexParser {
 
             Element cardElement = rawCard.select("td.card > a").first();
 
+            String setCode = rawCard.select("td").get(1).text();
+
             parsedCard.setName(cardElement.text());
+            parsedCard.setSet(setCode);
             parsedCard.setLink(cardElement.attr("href"));
             parsedCard.setRetailPrice(Double.parseDouble(rawCard.select("td.text-right").first().text()));
 

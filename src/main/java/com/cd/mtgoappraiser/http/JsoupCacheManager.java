@@ -56,7 +56,9 @@ public class JsoupCacheManager {
             System.out.println("Need to request: " + pageUrl);
             System.out.println("Sleeping for a ~second so we appear less bot like.");
             Thread.sleep(ThreadLocalRandom.current().nextInt(700, 1301));
-            theHtml = Jsoup.connect(pageUrl).get();
+            theHtml = Jsoup.connect(pageUrl).header("Accept-Encoding", "gzip, deflate")
+                                            .maxBodySize(0)
+                                            .timeout(600000).get();
             FileUtils.write(formatCache, theHtml.toString());
         }
 

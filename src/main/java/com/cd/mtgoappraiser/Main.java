@@ -10,6 +10,7 @@ import com.cd.mtgoappraiser.model.MarketCard;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.util.CollectionUtils;
 
 import java.net.URL;
 import java.util.*;
