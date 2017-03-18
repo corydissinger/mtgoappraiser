@@ -52,14 +52,14 @@ public class Card {
 
     @Override
     public boolean equals(Object right) {
-        if(right instanceof Card) {
-            final Card theRight = (Card) right;
-            if(this.name.equals(theRight.getName())
-                && this.set.equals(theRight.getSet())
-                && this.isPremium == theRight.isPremium()) {
-                return true;
-            }
+        final Card theRight = (Card) right;
+
+        if(this.name.equals(theRight.getName())
+            && this.set.equals(theRight.getSet())
+            && this.isPremium == theRight.isPremium()) {
+            return true;
         }
+
         return false;
     }
 }

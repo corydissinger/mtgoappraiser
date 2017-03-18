@@ -51,7 +51,7 @@ public class MtgGoldfishIndexParserTest {
         List<String> indexUrls = mtgoGoldfishIndexParser.getIndexUrls(theHtml);
 
         assertTrue(indexUrls != null);
-        assertTrue(indexUrls.size() == 46);
+        assertTrue(indexUrls.size() > 100);
     }
 
     @Test

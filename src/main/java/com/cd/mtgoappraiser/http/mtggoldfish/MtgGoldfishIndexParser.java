@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
 public class MtgGoldfishIndexParser {
 
     public List<String> getIndexUrls(Document theHtml) throws Exception {
-        List<Element> links = theHtml.select("body > div.container-fluid.layout-container-fluid > table > tbody > tr > td > a");
+        List<Element> links = theHtml.select("li[role=presentation] > a");
 
-        List<String> indexUrls = links.stream().map(link -> link.attr("href")).collect(Collectors.toList());
+        List<String> indexUrls = links.stream().map(link -> link.attr("href"))
+                                               .filter(link -> link.contains("index")).collect(Collectors.toList());
 
         return indexUrls;
     }

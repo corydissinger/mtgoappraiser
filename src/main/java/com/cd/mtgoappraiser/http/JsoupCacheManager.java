@@ -1,10 +1,13 @@
 package com.cd.mtgoappraiser.http;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -16,6 +19,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Created by Cory on 9/8/2016.
  */
 public class JsoupCacheManager {
+
+    private static final Logger logger = Logger.getLogger(JsoupCacheManager.class);
 
     private File cacheFolder;
 
@@ -53,13 +58,36 @@ public class JsoupCacheManager {
             theHtml = Jsoup.parse(FileUtils.readFileToString(formatCache));
         } else {
             //Sleep so that our requesting doesn't look as robotic...
-            System.out.println("Need to request: " + pageUrl);
-            System.out.println("Sleeping for a ~second so we appear less bot like.");
+            logger.info("Need to request: " + pageUrl);
+            logger.info("Sleeping for a ~second so we appear less bot like.");
             Thread.sleep(ThreadLocalRandom.current().nextInt(700, 1301));
-            theHtml = Jsoup.connect(pageUrl).header("Accept-Encoding", "gzip, deflate")
-                                            .maxBodySize(0)
-                                            .timeout(600000).get();
-            FileUtils.write(formatCache, theHtml.toString());
+
+            Connection.Response resp;
+
+            try {
+                resp = Jsoup.connect(pageUrl).header("Accept-Encoding", "gzip, deflate")
+                        .maxBodySize(0)
+                        .timeout(600000).execute();
+            } catch (HttpStatusException e) {
+                logger.error("Failed to load HTML for " + pageUrl);
+                logger.error(e.getMessage());
+                return null;
+            }
+
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(formatCache));
+
+            try {
+                out.write(resp.bodyAsBytes());
+            } catch (IOException ioe) {
+                logger.error("Could not cache result for " + pageUrl);
+                logger.error(ioe.getMessage());
+            } finally {
+                if(out != null) {
+                    out.close();
+                }
+            }
+
+            theHtml = resp.parse();
         }
 
         return theHtml;
