@@ -1,11 +1,14 @@
 package com.cd.mtgoappraiser.http;
 
+import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.safety.Cleaner;
+import org.jsoup.safety.Whitelist;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -43,11 +46,21 @@ public class JsoupCacheManager {
 
         if(formatCache.exists()) {
             BasicFileAttributes fileAttributes = Files.readAttributes(formatCache.toPath(), BasicFileAttributes.class);
-            FileTime lastModified = fileAttributes.lastModifiedTime();
-            Instant lastModifiedInstant = lastModified.toInstant();
+            FileTime created = fileAttributes.creationTime();
+            Instant createdInstant = created.toInstant();
             Instant oneDayAgo = Instant.now().minus(24, ChronoUnit.HOURS);
 
-            shouldLoadFromCache = lastModifiedInstant.isAfter(oneDayAgo);
+            shouldLoadFromCache = !oneDayAgo.isAfter(createdInstant);
+
+            if(!shouldLoadFromCache) {
+                final boolean deleteSuccessful = FileUtils.deleteQuietly(formatCache);
+
+                if(deleteSuccessful) {
+                    logger.info("Successfully deleted cache for format " + pageUrl);
+                } else {
+                    logger.error("Failed to delete cache for format " + pageUrl);
+                }
+            }
         } else {
             shouldLoadFromCache = false;
         }
@@ -65,29 +78,31 @@ public class JsoupCacheManager {
             Connection.Response resp;
 
             try {
-                resp = Jsoup.connect(pageUrl).header("Accept-Encoding", "gzip, deflate")
+                theHtml = Jsoup.connect(pageUrl).header("Accept-Encoding", "gzip, deflate")
                         .maxBodySize(0)
-                        .timeout(600000).execute();
+                        .timeout(600000).get();
             } catch (HttpStatusException e) {
                 logger.error("Failed to load HTML for " + pageUrl);
                 logger.error(e.getMessage());
                 return null;
             }
 
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(formatCache));
+            Whitelist whitelist = Whitelist.relaxed();
+
+            whitelist.addAttributes(":all", "class");
+
+            Cleaner cleaner = new Cleaner(whitelist);
+
+            theHtml = cleaner.clean(theHtml);
 
             try {
-                out.write(resp.bodyAsBytes());
+                HtmlCompressor compressor = new HtmlCompressor();
+
+                FileUtils.write(formatCache, compressor.compress(theHtml.toString()));
             } catch (IOException ioe) {
                 logger.error("Could not cache result for " + pageUrl);
                 logger.error(ioe.getMessage());
-            } finally {
-                if(out != null) {
-                    out.close();
-                }
             }
-
-            theHtml = resp.parse();
         }
 
         return theHtml;

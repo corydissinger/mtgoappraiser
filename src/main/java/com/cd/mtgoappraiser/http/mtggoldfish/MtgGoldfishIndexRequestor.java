@@ -40,7 +40,7 @@ public class MtgGoldfishIndexRequestor {
         }
 
         try {
-            theHtml = jsoupCacheManager.loadFromCache(mtgoGoldfishBaseUrl + pageUrl + "#online");
+            theHtml = jsoupCacheManager.loadFromCache(pageUrl + "#online");
         } catch (Exception e) {
             e.printStackTrace();
             return null;
