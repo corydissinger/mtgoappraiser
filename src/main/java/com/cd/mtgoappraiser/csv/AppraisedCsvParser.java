@@ -14,26 +14,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.cd.mtgoappraiser.csv.Constants.*;
+
 /**
  * Created by Cory on 7/16/2016.
  */
-@Service("mtgoCsvParser")
-public class MtgoCSVParser {
+@Service("appraisedCsvParser")
+public class AppraisedCsvParser {
 
     public List<Card> getCards(URL urlToCollection) {
         List<Card> cards = null;
 
         try {
-            Iterable<CSVRecord> records = CSVParser.parse(urlToCollection, Charset.defaultCharset(), CSVFormat.RFC4180.withHeader());
+            Iterable<CSVRecord> records = CSVParser.parse(urlToCollection, Charset.defaultCharset(), CSVFormat.RFC4180.withHeader(Constants.APPRAISED_CARDS_CSV_HEADERS));
 
             cards = StreamSupport.stream(records.spliterator(), false)
                                     .map(csvRecord -> {
                                         Card theCard = new Card();
 
-                                        theCard.setName(csvRecord.get(Constants.HEADER_NAME));
-                                        theCard.setQuantity(Integer.parseInt(csvRecord.get(Constants.HEADER_QUANTITY)));
-                                        theCard.setSet(csvRecord.get(Constants.HEADER_SET));
-                                        theCard.setPremium("Yes".equals(csvRecord.get(Constants.HEADER_PREMIUM)));
+                                        theCard.setName(csvRecord.get(HEADER_NAME));
+                                        theCard.setQuantity(Integer.parseInt(csvRecord.get(HEADER_QUANTITY)));
+                                        theCard.setSet(csvRecord.get(HEADER_SET));
+                                        theCard.setPremium("Yes".equals(csvRecord.get(HEADER_PREMIUM)));
 
                                         return theCard;
                                     })

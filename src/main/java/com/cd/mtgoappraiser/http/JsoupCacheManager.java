@@ -42,7 +42,7 @@ public class JsoupCacheManager {
 
         final boolean shouldLoadFromCache;
 
-        File formatCache = new File(cacheFolder + File.separator + tempFileName);
+        File formatCache = new File(cacheFolder + File.separator + "prices-" + tempFileName);
 
         if(formatCache.exists()) {
             BasicFileAttributes fileAttributes = Files.readAttributes(formatCache.toPath(), BasicFileAttributes.class);

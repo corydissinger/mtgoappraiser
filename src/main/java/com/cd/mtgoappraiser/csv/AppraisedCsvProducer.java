@@ -30,13 +30,7 @@ public class AppraisedCsvProducer {
             }
 
             writer = new FileWriter(outputCsv);
-            printer = new CSVPrinter(writer, CSVFormat.EXCEL.withHeader("Name",
-                                                                         "Set",
-                                                                         "Quantity",
-                                                                         "Premium",
-                                                                         "MTGGoldfishRetailAggregate",
-                                                                         "MTGOTradersHotBuyListPrice",
-                                                                         "MTGGoldfishLink"));
+            printer = new CSVPrinter(writer, CSVFormat.EXCEL.withHeader(Constants.APPRAISED_CARDS_CSV_HEADERS));
 
             for(AppraisedCard appraisedCard : appraisedCards) {
                 try {
