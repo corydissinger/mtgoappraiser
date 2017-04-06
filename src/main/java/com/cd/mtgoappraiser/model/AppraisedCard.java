@@ -17,6 +17,8 @@ public class AppraisedCard {
     private String set;
     private boolean isPremium;
 
+    public AppraisedCard() {}
+
     public AppraisedCard(MarketCard aCard) {
         this.setName(aCard.getName());
         this.setQuantity(aCard.getQuantity());

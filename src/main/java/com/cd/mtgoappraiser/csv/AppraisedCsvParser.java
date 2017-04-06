@@ -1,5 +1,6 @@
 package com.cd.mtgoappraiser.csv;
 
+import com.cd.mtgoappraiser.model.AppraisedCard;
 import com.cd.mtgoappraiser.model.Card;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -22,20 +23,22 @@ import static com.cd.mtgoappraiser.csv.Constants.*;
 @Service("appraisedCsvParser")
 public class AppraisedCsvParser {
 
-    public List<Card> getCards(URL urlToCollection) {
-        List<Card> cards = null;
+    public List<AppraisedCard> getCards(URL urlToCollection) {
+        List<AppraisedCard> cards = null;
 
         try {
             Iterable<CSVRecord> records = CSVParser.parse(urlToCollection, Charset.defaultCharset(), CSVFormat.RFC4180.withHeader(Constants.APPRAISED_CARDS_CSV_HEADERS));
 
             cards = StreamSupport.stream(records.spliterator(), false)
                                     .map(csvRecord -> {
-                                        Card theCard = new Card();
+                                        AppraisedCard theCard = new AppraisedCard();
 
                                         theCard.setName(csvRecord.get(HEADER_NAME));
                                         theCard.setQuantity(Integer.parseInt(csvRecord.get(HEADER_QUANTITY)));
                                         theCard.setSet(csvRecord.get(HEADER_SET));
                                         theCard.setPremium("Yes".equals(csvRecord.get(HEADER_PREMIUM)));
+                                        theCard.setMtgoTradersBuyPrice(Double.parseDouble(csvRecord.get(HEADER_MTGOTRADER_BUYLIST)));
+                                        theCard.setMtgGoldfishRetailAggregate(Double.parseDouble(csvRecord.get(HEADER_MTGGOLDFISH_RETAIL_AGGREGATE)));
 
                                         return theCard;
                                     })
