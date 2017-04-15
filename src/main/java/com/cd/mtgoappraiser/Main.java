@@ -1,18 +1,25 @@
 package com.cd.mtgoappraiser;
 
 import com.cd.mtgoappraiser.config.AppraiserConfig;
+import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
+import com.cd.mtgoappraiser.http.JsoupCacheManager;
 import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import com.cd.mtgoappraiser.model.Card;
 import com.cd.mtgoappraiser.model.MarketCard;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
+import com.cd.mtgoappraiser.model.TimeSeriesCard;
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,11 +28,74 @@ import java.util.stream.Collectors;
  * Created by Cory on 7/16/2016.
  */
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class);
+    private static final String OPT_APPRAISE = "appraise";
+    private static final String OPT_TIME_SERIES_APPRAISE = "timeSeriesAppraise";
+
     public static void main(String [] args) {
         System.out.println("Starting mtgoappraiser...");
+
+        Options cliOptions = new Options();
+
+        cliOptions.addOption(OPT_APPRAISE, "Appraise target collection.");
+        cliOptions.addOption(OPT_TIME_SERIES_APPRAISE, "Appraise all appraised collections.");
+
+        DefaultParser cliParser = new DefaultParser();
+        CommandLine cli = null;
+
+        try {
+            cli = cliParser.parse(cliOptions, args);
+            logger.info("CLI args=" + cli.toString());
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+            System.exit(-1);
+        }
+
         //Setup spring context and load beans
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppraiserConfig.class);
 
+        if(cli.hasOption(OPT_TIME_SERIES_APPRAISE)) {
+            try {
+                timeSeriesAppraiseCollection(applicationContext);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                System.exit(-1);
+            }
+        } else {
+            appraiseCollection(applicationContext);
+        }
+
+        System.out.println("All done.");
+        System.exit(0);
+    }
+
+    private static void timeSeriesAppraiseCollection(ApplicationContext applicationContext) throws IOException {
+        AppraisedCsvParser appraisedCsvParser = (AppraisedCsvParser) applicationContext.getBean("appraisedCsvParser");
+
+        List<URL> appraisedFiles = appraisedCsvParser.getAppraisedFiles();
+
+        Map<Integer, TimeSeriesCard> cardHashToTimeSeriesCardMap = new HashMap<>();
+
+        appraisedFiles.stream().forEach(url -> {
+            List<AppraisedCard> cards = appraisedCsvParser.getCards(url);
+            final String urlAsString = url.toString();
+            LocalDate currentCollectionDate = LocalDate.parse(urlAsString);
+
+            cards.stream().forEach(appraisedCard -> {
+                Integer cardHash = appraisedCard.hashCode();
+
+                TimeSeriesCard existingCard = cardHashToTimeSeriesCardMap.get(cardHash);
+
+                if(existingCard == null) {
+                    existingCard = new TimeSeriesCard();
+                    cardHashToTimeSeriesCardMap.put(cardHash, existingCard);
+                }
+                existingCard.putDateAndCard(currentCollectionDate, appraisedCard);
+            });
+        });
+    }
+
+    private static void appraiseCollection(ApplicationContext applicationContext) {
         MtgoCSVParser mtgoCsvParser = (MtgoCSVParser) applicationContext.getBean("mtgoCsvParser");
         MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = (MtgGoldfishIndexRequestor) applicationContext.getBean("mtgGoldfishIndexRequestor");
         AppraisedCsvProducer appraisedCsvProducer = (AppraisedCsvProducer) applicationContext.getBean("appraisedCsvProducer");
@@ -90,8 +160,5 @@ public class Main {
         appraisedCards.sort(Comparator.comparing(AppraisedCard::getMtgoTradersBuyPrice).reversed());
 
         appraisedCsvProducer.printAppraisedCards(appraisedCards);
-
-        System.out.println("All done.");
-        System.exit(0);
     }
 }

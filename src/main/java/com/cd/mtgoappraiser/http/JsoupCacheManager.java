@@ -35,19 +35,19 @@ public class JsoupCacheManager {
         final String tempFileName;
 
         if(suggestedTempName == null) {
-            tempFileName = getTempFileName(pageUrl);
+            tempFileName = "prices-" + getTempFileName(pageUrl);
         } else {
             tempFileName = suggestedTempName;
         }
 
         final boolean shouldLoadFromCache;
 
-        File formatCache = new File(cacheFolder + File.separator + "prices-" + tempFileName);
+        File formatCache = new File(cacheFolder + File.separator + tempFileName);
 
         if(formatCache.exists()) {
             BasicFileAttributes fileAttributes = Files.readAttributes(formatCache.toPath(), BasicFileAttributes.class);
-            FileTime created = fileAttributes.creationTime();
-            Instant createdInstant = created.toInstant();
+            FileTime lastModified = fileAttributes.lastModifiedTime();
+            Instant createdInstant = lastModified.toInstant();
             Instant oneDayAgo = Instant.now().minus(24, ChronoUnit.HOURS);
 
             shouldLoadFromCache = !oneDayAgo.isAfter(createdInstant);

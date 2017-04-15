@@ -5,12 +5,16 @@ import com.cd.mtgoappraiser.model.Card;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -20,8 +24,10 @@ import static com.cd.mtgoappraiser.csv.Constants.*;
 /**
  * Created by Cory on 7/16/2016.
  */
-@Service("appraisedCsvParser")
 public class AppraisedCsvParser {
+
+    private String outputFileFolder;
+    private String outputFileName;
 
     public List<AppraisedCard> getCards(URL urlToCollection) {
         List<AppraisedCard> cards = null;
@@ -50,4 +56,35 @@ public class AppraisedCsvParser {
         return cards;
     }
 
+    public List<URL> getAppraisedFiles() throws IOException {
+        File appraisedFileFolder = new File(outputFileFolder);
+
+        final FilenameFilter filter = (dir, name) -> {
+            if(name.startsWith(outputFileName.substring(0, outputFileName.length() - 3))) {
+                return true;
+            }
+
+            return false;
+        };
+
+        URL[] appraisedFileUrls = FileUtils.toURLs(appraisedFileFolder.listFiles(filter));
+
+        return Arrays.asList(appraisedFileUrls);
+    }
+
+    public String getOutputFileFolder() {
+        return outputFileFolder;
+    }
+
+    public void setOutputFileFolder(String outputFileFolder) {
+        this.outputFileFolder = outputFileFolder;
+    }
+
+    public String getOutputFileName() {
+        return outputFileName;
+    }
+
+    public void setOutputFileName(String outputFileName) {
+        this.outputFileName = outputFileName;
+    }
 }

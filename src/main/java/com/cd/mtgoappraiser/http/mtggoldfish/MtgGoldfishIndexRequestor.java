@@ -21,7 +21,7 @@ public class MtgGoldfishIndexRequestor {
 
     public List<String> getIndexUrls() {
         try {
-            Document theHtml = jsoupCacheManager.loadFromCache(mtgoGoldfishBaseUrl + INDICES);
+            Document theHtml = jsoupCacheManager.loadFromCache(mtgoGoldfishBaseUrl + INDICES, "indices");
             if(theHtml != null) {
                 return mtgGoldfishIndexParser.getIndexUrls(theHtml);
             }

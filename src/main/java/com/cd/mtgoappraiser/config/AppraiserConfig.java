@@ -1,5 +1,6 @@
 package com.cd.mtgoappraiser.config;
 
+import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.http.JsoupCacheManager;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 
 @Configuration
 @EnableTransactionManagement
@@ -59,11 +61,27 @@ public class AppraiserConfig {
     public AppraisedCsvProducer appraisedCsvProducer() {
         AppraisedCsvProducer appraisedCsvProducer = new AppraisedCsvProducer();
 
-        appraisedCsvProducer.setOutputFile(environment.getRequiredProperty("output.file.path"));
+        appraisedCsvProducer.setOutputFile(outputFileFormatted());
         appraisedCsvProducer.setMtgGoldfishBaseUrl(environment.getRequiredProperty("mtggoldfish.base.url"));
 
         return appraisedCsvProducer;
     }
+
+    @Bean
+    public String outputFileFormatted() {
+        final String rawOutputFile = environment.getRequiredProperty("output.file.path") + environment.getRequiredProperty("output.file.name");
+        return String.format(rawOutputFile, LocalDate.now().toString());
+    }
+
+    @Bean
+    public AppraisedCsvParser appraisedCsvParser() {
+        AppraisedCsvParser appraisedCsvParser = new AppraisedCsvParser();
+
+        appraisedCsvParser.setOutputFileFolder(environment.getRequiredProperty("output.file.path"));
+        appraisedCsvParser.setOutputFileName(environment.getRequiredProperty("output.file.name"));
+
+        return appraisedCsvParser;
+    }    
 
     @Bean
     public MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor() {
