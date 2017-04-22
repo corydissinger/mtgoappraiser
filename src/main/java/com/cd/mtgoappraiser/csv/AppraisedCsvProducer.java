@@ -13,25 +13,15 @@ import java.util.List;
 /**
  * Created by Cory on 8/14/2016.
  */
-public class AppraisedCsvProducer {
+public class AppraisedCsvProducer extends AbstractCsvProducer {
 
     private String outputFile;
     private String mtgGoldfishBaseUrl;
 
     public void printAppraisedCards(List<AppraisedCard> appraisedCards) {
-        FileWriter writer = null;
         CSVPrinter printer = null;
-
         try {
-            File outputCsv = new File(outputFile);
-
-            if(!outputCsv.exists()) {
-                outputCsv.getParentFile().mkdirs();
-                outputCsv.createNewFile();
-            }
-
-            writer = new FileWriter(outputCsv);
-            printer = new CSVPrinter(writer, CSVFormat.EXCEL.withHeader(Constants.APPRAISED_CARDS_CSV_HEADERS));
+            printer = getCsvPrinter(outputFile);
 
             for(AppraisedCard appraisedCard : appraisedCards) {
                 try {
@@ -52,9 +42,7 @@ public class AppraisedCsvProducer {
             e.printStackTrace();
         } finally {
             try {
-                if(writer != null && printer != null) {
-                    writer.flush();
-                    writer.close();
+                if(printer != null) {
                     printer.close();
                 }
             } catch (IOException e) {

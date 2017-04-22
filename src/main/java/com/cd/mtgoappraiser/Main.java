@@ -4,6 +4,7 @@ import com.cd.mtgoappraiser.config.AppraiserConfig;
 import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
+import com.cd.mtgoappraiser.csv.TimeSeriesAppraisalCsvProducer;
 import com.cd.mtgoappraiser.http.JsoupCacheManager;
 import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
 import com.cd.mtgoappraiser.model.AppraisedCard;
@@ -12,6 +13,9 @@ import com.cd.mtgoappraiser.model.MarketCard;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import com.cd.mtgoappraiser.model.TimeSeriesCard;
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -19,7 +23,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,6 +64,8 @@ public class Main {
         if(cli.hasOption(OPT_TIME_SERIES_APPRAISE)) {
             try {
                 timeSeriesAppraiseCollection(applicationContext);
+            } catch (NumberFormatException nfe) {
+                logger.error(nfe.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 System.exit(-1);
@@ -71,17 +80,31 @@ public class Main {
 
     private static void timeSeriesAppraiseCollection(ApplicationContext applicationContext) throws IOException {
         AppraisedCsvParser appraisedCsvParser = (AppraisedCsvParser) applicationContext.getBean("appraisedCsvParser");
+        TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer = (TimeSeriesAppraisalCsvProducer) applicationContext.getBean("timeSeriesAppraisalCsvProducer");
 
         List<URL> appraisedFiles = appraisedCsvParser.getAppraisedFiles();
 
         Map<Integer, TimeSeriesCard> cardHashToTimeSeriesCardMap = new HashMap<>();
 
+        LocalDate[] minMaxDate = new LocalDate[]{null, null};
+
         appraisedFiles.stream().forEach(url -> {
             List<AppraisedCard> cards = appraisedCsvParser.getCards(url);
             final String urlAsString = url.toString();
-            LocalDate currentCollectionDate = LocalDate.parse(urlAsString);
+            final String datePart = urlAsString.substring(urlAsString.indexOf("-") + 1, urlAsString.length() - 4);
 
-            cards.stream().forEach(appraisedCard -> {
+            LocalDate currentCollectionDate = com.cd.mtgoappraiser.util.DateUtils.getDate(datePart, urlAsString);
+            //Happens after this for 3/8... hmmms
+
+            if(minMaxDate[0] == null || minMaxDate[0].compareTo(currentCollectionDate) > 0) {
+                minMaxDate[0] = currentCollectionDate;
+            }
+
+            if(minMaxDate[1] == null || minMaxDate[1].compareTo(currentCollectionDate) < 0) {
+                minMaxDate[1] = currentCollectionDate;
+            }
+
+            cards.stream().filter(card -> card != null).forEach(appraisedCard -> {
                 Integer cardHash = appraisedCard.hashCode();
 
                 TimeSeriesCard existingCard = cardHashToTimeSeriesCardMap.get(cardHash);
@@ -90,9 +113,12 @@ public class Main {
                     existingCard = new TimeSeriesCard();
                     cardHashToTimeSeriesCardMap.put(cardHash, existingCard);
                 }
+
                 existingCard.putDateAndCard(currentCollectionDate, appraisedCard);
             });
         });
+
+        timeSeriesAppraisalCsvProducer.printTimeSeriesCards(cardHashToTimeSeriesCardMap.values(), minMaxDate[0], minMaxDate[1]);
     }
 
     private static void appraiseCollection(ApplicationContext applicationContext) {

@@ -13,13 +13,20 @@ import java.util.List;
  */
 public class TimeSeriesCard {
 
+    private AppraisedCard theCard;
+
     public TimeSeriesCard() {
         dateToValueMap = new HashMap<>();
     }
 
     private HashMap<LocalDate, AppraisedCard> dateToValueMap;
 
+    public AppraisedCard getCard() {
+        return theCard;
+    }
+
     public void putDateAndCard(LocalDate aDate, AppraisedCard aCard) {
+        theCard = aCard;
         dateToValueMap.put(aDate, aCard);
     }
 

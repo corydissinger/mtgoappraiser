@@ -6,6 +6,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -26,6 +28,8 @@ import static com.cd.mtgoappraiser.csv.Constants.*;
  */
 public class AppraisedCsvParser {
 
+    private static final Logger logger = Logger.getLogger(AppraisedCsvParser.class);
+
     private String outputFileFolder;
     private String outputFileName;
 
@@ -39,12 +43,21 @@ public class AppraisedCsvParser {
                                     .map(csvRecord -> {
                                         AppraisedCard theCard = new AppraisedCard();
 
-                                        theCard.setName(csvRecord.get(HEADER_NAME));
-                                        theCard.setQuantity(Integer.parseInt(csvRecord.get(HEADER_QUANTITY)));
-                                        theCard.setSet(csvRecord.get(HEADER_SET));
-                                        theCard.setPremium("Yes".equals(csvRecord.get(HEADER_PREMIUM)));
-                                        theCard.setMtgoTradersBuyPrice(Double.parseDouble(csvRecord.get(HEADER_MTGOTRADER_BUYLIST)));
-                                        theCard.setMtgGoldfishRetailAggregate(Double.parseDouble(csvRecord.get(HEADER_MTGGOLDFISH_RETAIL_AGGREGATE)));
+                                        String quantity = csvRecord.get(HEADER_QUANTITY);
+
+                                        if (quantity.isEmpty() || !StringUtils.isNumeric(quantity))
+                                            return null;
+
+                                        try {
+                                            theCard.setName(csvRecord.get(HEADER_NAME));
+                                            theCard.setQuantity(Integer.parseInt(quantity));
+                                            theCard.setSet(csvRecord.get(HEADER_SET));
+                                            theCard.setPremium("Yes".equals(csvRecord.get(HEADER_PREMIUM)));
+                                            theCard.setMtgoTradersBuyPrice(Double.parseDouble(csvRecord.get(HEADER_MTGOTRADER_BUYLIST)));
+                                            theCard.setMtgGoldfishRetailAggregate(Double.parseDouble(csvRecord.get(HEADER_MTGGOLDFISH_RETAIL_AGGREGATE)));
+                                        } catch (NumberFormatException nfe) {
+                                            logger.error("Blew up on this: " + csvRecord.toString());
+                                        }
 
                                         return theCard;
                                     })
@@ -60,7 +73,7 @@ public class AppraisedCsvParser {
         File appraisedFileFolder = new File(outputFileFolder);
 
         final FilenameFilter filter = (dir, name) -> {
-            if(name.startsWith(outputFileName.substring(0, outputFileName.length() - 3))) {
+            if(name.startsWith(outputFileName.substring(0, outputFileName.indexOf("-")))) {
                 return true;
             }
 

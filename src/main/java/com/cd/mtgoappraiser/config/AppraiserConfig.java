@@ -3,6 +3,7 @@ package com.cd.mtgoappraiser.config;
 import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
+import com.cd.mtgoappraiser.csv.TimeSeriesAppraisalCsvProducer;
 import com.cd.mtgoappraiser.http.JsoupCacheManager;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexParser;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
@@ -66,6 +67,15 @@ public class AppraiserConfig {
 
         return appraisedCsvProducer;
     }
+
+    @Bean
+    public TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer() {
+        TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer = new TimeSeriesAppraisalCsvProducer();
+
+        timeSeriesAppraisalCsvProducer.setOutputFilePath(environment.getRequiredProperty("output.file.path"));
+
+        return timeSeriesAppraisalCsvProducer;
+    }    
 
     @Bean
     public String outputFileFormatted() {
