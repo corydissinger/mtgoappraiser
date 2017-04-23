@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Cory on 4/22/2017.
@@ -26,7 +27,7 @@ public class TimeSeriesAppraisalCsvProducer extends AbstractCsvProducer {
     }
 
     private String getOutputFile(String lowestDate, String highestDate) {
-        return outputFilePath + "timeSeriesFrom-" + lowestDate + "-to-" + highestDate;
+        return outputFilePath + "timeSeriesFrom-" + lowestDate + "-to-" + highestDate + ".csv";
     }
 
     public void printTimeSeriesCards(Collection<TimeSeriesCard> timeSeriesCards, LocalDate minDate, LocalDate maxDate) {
@@ -37,22 +38,30 @@ public class TimeSeriesAppraisalCsvProducer extends AbstractCsvProducer {
             printer = getCsvPrinter(outputFile, Constants.TIME_SERIES_CARDS_CSV_HEADERS);
 
             for(TimeSeriesCard timeSeriesCard : timeSeriesCards) {
-                AppraisedCard appraisedCard = timeSeriesCard.getCard();
+                AppraisedCard firstCard = timeSeriesCard.getFirstCard();
+                AppraisedCard lastCard = timeSeriesCard.getLastCard();
+                boolean isHeld = timeSeriesCard.isHeld();
 
                 try {
-                    printer.printRecord(appraisedCard.getName(),
-                            appraisedCard.getSet(),
-                            appraisedCard.getQuantity(),
-                            appraisedCard.isPremium() ? "Yes" : "No",
-                            appraisedCard.getMtgGoldfishRetailAggregate(),
-                            appraisedCard.getMtgoTradersBuyPrice(),
+                    printer.printRecord(firstCard.getName(),
+                            firstCard.getSet(),
+                            firstCard.getQuantity(),
+                            lastCard.getQuantity(),
+                            firstCard.isPremium() ? "Yes" : "No",
+                            firstCard.getMtgGoldfishRetailAggregate(),
+                            firstCard.getMtgoTradersBuyPrice(),
+                            lastCard.getMtgGoldfishRetailAggregate(),
+                            lastCard.getMtgoTradersBuyPrice(),
                             timeSeriesCard.getChangeAsPercent(),
                             timeSeriesCard.getLocalChangeAsPercent(),
                             timeSeriesCard.getChangeRaw(),
                             timeSeriesCard.getLocalChangeRaw(),
-                            timeSeriesCard.getSortedDates().stream().map(date -> date.toString()).reduce("", String::concat));
+                            timeSeriesCard.getSortedDates().stream().map(date -> date.toString()).collect(Collectors.joining("; ")));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                } catch (NumberFormatException nfe) {
+                    logger.error(nfe.getMessage());
+                    logger.error("NFE found with " + timeSeriesCard.toString() + " and appraised " + firstCard.toString());
                 }
             }
 

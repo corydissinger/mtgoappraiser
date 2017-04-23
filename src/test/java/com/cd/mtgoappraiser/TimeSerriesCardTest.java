@@ -31,28 +31,40 @@ public class TimeSerriesCardTest {
     public void testChangeRaw() throws Exception {
         TimeSeriesCard tsc = getTestCard();
 
-        assertTrue(tsc.getChangeRaw().equals(new Double(10*11.1) - new Double(11.1)));
+        assertTrue(tsc.getChangeRaw().equals(new Double(10*11.11) - new Double(11.11)));
     }
 
     @Test
     public void testChangeAsPercent() throws Exception {
         TimeSeriesCard tsc = getTestCard();
 
-        assertTrue(tsc.getChangeAsPercent().equals(BigDecimal.valueOf(new Double(10*11.1) / new Double(11.1))));
+        assertTrue(tsc.getChangeAsPercent().equals(BigDecimal.valueOf(new Double(10*11.11) / new Double(11.11)).setScale(2, BigDecimal.ROUND_DOWN)));
     }
 
     @Test
     public void testLocalChangeRaw() throws Exception {
         TimeSeriesCard tsc = getTestCard();
 
-        assertTrue(tsc.getLocalChangeRaw().equals(new Double(10*11.1) - new Double(9*11.1)));
+        assertTrue(tsc.getLocalChangeRaw().equals(new Double(10*11.11) - new Double(9*11.11)));
     }
 
     @Test
     public void testLocalChangeAsPercent() throws Exception {
         TimeSeriesCard tsc = getTestCard();
 
-        assertTrue(tsc.getLocalChangeAsPercent().setScale(10, BigDecimal.ROUND_CEILING).equals(BigDecimal.valueOf(new Double(10*11.1) / new Double(9*11.1)).setScale(10, BigDecimal.ROUND_CEILING)));
+        assertTrue(tsc.getLocalChangeAsPercent().equals(BigDecimal.valueOf(new Double(10*11.1) / new Double(9*11.1)).setScale(2, BigDecimal.ROUND_DOWN)));
+    }
+
+    @Test
+    public void testLocalChangeOneValue() throws Exception {
+        TimeSeriesCard tsc = new TimeSeriesCard();
+        AppraisedCard cardForOneDay = new AppraisedCard();
+
+        cardForOneDay.setMtgGoldfishRetailAggregate(1.11);
+
+        tsc.putDateAndCard(LocalDate.now(), cardForOneDay);
+
+        assertTrue(BigDecimal.ZERO.equals(tsc.getLocalChangeAsPercent()));
     }
 
     public TimeSeriesCard getTestCard() {
@@ -62,7 +74,8 @@ public class TimeSerriesCardTest {
             LocalDate myDate = LocalDate.of(2017, 3, i+2);
 
             AppraisedCard myCard = new AppraisedCard();
-            myCard.setMtgoTradersBuyPrice(new Double(i*11.1));
+            myCard.setMtgoTradersBuyPrice(new Double(i*11.11));
+            myCard.setMtgGoldfishRetailAggregate(new Double(i*11.11));
 
             tsc.putDateAndCard(myDate, myCard);
         }

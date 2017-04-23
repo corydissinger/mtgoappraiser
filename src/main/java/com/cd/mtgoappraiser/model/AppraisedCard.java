@@ -88,4 +88,25 @@ public class AppraisedCard {
     public String toString() {
         return ReflectionToStringBuilder.toString(this, ToStringStyle.SIMPLE_STYLE);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AppraisedCard that = (AppraisedCard) o;
+
+        if (isPremium != that.isPremium) return false;
+        if (!name.equals(that.name)) return false;
+        return set.equals(that.set);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + set.hashCode();
+        result = 31 * result + (isPremium ? 1 : 0);
+        return result;
+    }
 }

@@ -81,6 +81,7 @@ public class Main {
     private static void timeSeriesAppraiseCollection(ApplicationContext applicationContext) throws IOException {
         AppraisedCsvParser appraisedCsvParser = (AppraisedCsvParser) applicationContext.getBean("appraisedCsvParser");
         TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer = (TimeSeriesAppraisalCsvProducer) applicationContext.getBean("timeSeriesAppraisalCsvProducer");
+        Double priceThreshold = (Double) applicationContext.getBean("priceThreshold");
 
         List<URL> appraisedFiles = appraisedCsvParser.getAppraisedFiles();
 
@@ -105,6 +106,10 @@ public class Main {
             }
 
             cards.stream().filter(card -> card != null).forEach(appraisedCard -> {
+                if(priceThreshold.compareTo(appraisedCard.getMtgoTradersBuyPrice()) > 0 && priceThreshold.compareTo(appraisedCard.getMtgGoldfishRetailAggregate()) > 0) {
+                    return;
+                }
+
                 Integer cardHash = appraisedCard.hashCode();
 
                 TimeSeriesCard existingCard = cardHashToTimeSeriesCardMap.get(cardHash);

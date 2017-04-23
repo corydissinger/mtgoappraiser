@@ -134,5 +134,10 @@ public class AppraiserConfig {
 
         return null;
     }
+
+    @Bean
+    public Double priceThreshold() {
+        return Double.parseDouble(environment.getRequiredProperty("price.threshold"));
+    }
 }
 
