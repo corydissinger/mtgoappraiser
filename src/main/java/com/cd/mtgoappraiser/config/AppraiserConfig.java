@@ -8,6 +8,7 @@ import com.cd.mtgoappraiser.http.JsoupCacheManager;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexParser;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
+import com.cd.mtgoappraiser.timeseries.TimeSeriesFileAppraiser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +70,20 @@ public class AppraiserConfig {
     }
 
     @Bean
+    public TimeSeriesFileAppraiser timeSeriesFileAppraiser() {
+        TimeSeriesFileAppraiser timeSeriesFileAppraiser = new TimeSeriesFileAppraiser();
+
+        timeSeriesFileAppraiser.setPriceThreshold(priceThreshold());
+        timeSeriesFileAppraiser.setAppraisedCsvParser(appraisedCsvParser());
+
+        return timeSeriesFileAppraiser;
+    }
+
+    @Bean
     public TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer() {
         TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer = new TimeSeriesAppraisalCsvProducer();
 
-        timeSeriesAppraisalCsvProducer.setOutputFilePath(environment.getRequiredProperty("output.file.path"));
+        timeSeriesAppraisalCsvProducer.setOutputFileFolder(environment.getRequiredProperty("output.file.path"));
 
         return timeSeriesAppraisalCsvProducer;
     }    

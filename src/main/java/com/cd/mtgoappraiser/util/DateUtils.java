@@ -14,15 +14,30 @@ import java.time.format.DateTimeParseException;
 public class DateUtils {
     private static final Logger logger = Logger.getLogger(DateUtils.class);
 
-    public static LocalDate getDate(String datePart, String urlAsString) {
+    public static LocalDate getDate(String fullUrl) throws DateTimeParseException {
+        return realBadRecursionBoys(fullUrl, 14);
+    }
+
+    private static LocalDate realBadRecursionBoys(String fullUrl, int i) {
+        String datePart = getDatePart(fullUrl, i);
+
         datePart = datePart.endsWith("-") ? StringUtils.chop(datePart) : datePart;
         datePart = datePart.startsWith("-") ? datePart.substring(1) : datePart;
 
         try {
             return LocalDate.parse(datePart, DateTimeFormatter.ofPattern("M-d-yyyy"));
         } catch(DateTimeParseException dte) {
-            logger.warn("Found old style incorrect date for " + urlAsString);
-            return LocalDate.parse(datePart, DateTimeFormatter.ofPattern("yyyy-M-d"));
+            try {
+                return LocalDate.parse(datePart, DateTimeFormatter.ofPattern("yyyy-M-d"));
+            } catch(DateTimeParseException dte2) {
+                return realBadRecursionBoys(fullUrl, i-1);
+            }
         }
+    }
+
+    private static String getDatePart(String fullUrl, Integer startIndex) {
+        String testDate = fullUrl.substring(fullUrl.length() - startIndex, fullUrl.length() - 4);
+
+        return testDate;
     }
 }

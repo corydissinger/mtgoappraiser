@@ -21,6 +21,10 @@ public class TimeSeriesCard {
 
     private HashMap<LocalDate, AppraisedCard> dateToValueMap;
 
+    public HashMap<LocalDate, AppraisedCard> getDateToValueMap() {
+        return dateToValueMap;
+    }
+
     public AppraisedCard getCard() {
         return theCard;
     }

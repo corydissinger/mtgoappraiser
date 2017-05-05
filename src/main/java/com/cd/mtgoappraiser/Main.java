@@ -12,6 +12,7 @@ import com.cd.mtgoappraiser.model.Card;
 import com.cd.mtgoappraiser.model.MarketCard;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import com.cd.mtgoappraiser.model.TimeSeriesCard;
+import com.cd.mtgoappraiser.timeseries.TimeSeriesFileAppraiser;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -81,47 +82,13 @@ public class Main {
     private static void timeSeriesAppraiseCollection(ApplicationContext applicationContext) throws IOException {
         AppraisedCsvParser appraisedCsvParser = (AppraisedCsvParser) applicationContext.getBean("appraisedCsvParser");
         TimeSeriesAppraisalCsvProducer timeSeriesAppraisalCsvProducer = (TimeSeriesAppraisalCsvProducer) applicationContext.getBean("timeSeriesAppraisalCsvProducer");
-        Double priceThreshold = (Double) applicationContext.getBean("priceThreshold");
+        TimeSeriesFileAppraiser timeSeriesFileAppraiser = (TimeSeriesFileAppraiser) applicationContext.getBean("timeSeriesFileAppraiser");
 
         List<URL> appraisedFiles = appraisedCsvParser.getAppraisedFiles();
 
-        Map<Integer, TimeSeriesCard> cardHashToTimeSeriesCardMap = new HashMap<>();
+        Map<Integer, TimeSeriesCard> cardHashToTimeSeriesCardMap = timeSeriesFileAppraiser.getCardToTimeSeriesMap(appraisedFiles);
 
-        LocalDate[] minMaxDate = new LocalDate[]{null, null};
-
-        appraisedFiles.stream().forEach(url -> {
-            List<AppraisedCard> cards = appraisedCsvParser.getCards(url);
-            final String urlAsString = url.toString();
-            final String datePart = urlAsString.substring(urlAsString.indexOf("-") + 1, urlAsString.length() - 4);
-
-            LocalDate currentCollectionDate = com.cd.mtgoappraiser.util.DateUtils.getDate(datePart, urlAsString);
-            //Happens after this for 3/8... hmmms
-
-            if(minMaxDate[0] == null || minMaxDate[0].compareTo(currentCollectionDate) > 0) {
-                minMaxDate[0] = currentCollectionDate;
-            }
-
-            if(minMaxDate[1] == null || minMaxDate[1].compareTo(currentCollectionDate) < 0) {
-                minMaxDate[1] = currentCollectionDate;
-            }
-
-            cards.stream().filter(card -> card != null).forEach(appraisedCard -> {
-                if(priceThreshold.compareTo(appraisedCard.getMtgoTradersBuyPrice()) > 0 && priceThreshold.compareTo(appraisedCard.getMtgGoldfishRetailAggregate()) > 0) {
-                    return;
-                }
-
-                Integer cardHash = appraisedCard.hashCode();
-
-                TimeSeriesCard existingCard = cardHashToTimeSeriesCardMap.get(cardHash);
-
-                if(existingCard == null) {
-                    existingCard = new TimeSeriesCard();
-                    cardHashToTimeSeriesCardMap.put(cardHash, existingCard);
-                }
-
-                existingCard.putDateAndCard(currentCollectionDate, appraisedCard);
-            });
-        });
+        LocalDate[] minMaxDate = timeSeriesFileAppraiser.getMinMaxDate();
 
         timeSeriesAppraisalCsvProducer.printTimeSeriesCards(cardHashToTimeSeriesCardMap.values(), minMaxDate[0], minMaxDate[1]);
     }
