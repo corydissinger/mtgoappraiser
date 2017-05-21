@@ -1,10 +1,14 @@
 package com.cd.mtgoappraiser.config;
 
+import com.cd.bot.wrapper.WrapperConfig;
+import com.cd.bot.wrapper.http.BotCameraService;
+import com.cd.bot.wrapper.http.OwnedTradeableCardService;
 import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.csv.TimeSeriesAppraisalCsvProducer;
 import com.cd.mtgoappraiser.http.JsoupCacheManager;
+import com.cd.mtgoappraiser.http.bot.AppraisedCardBotUpdater;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexParser;
 import com.cd.mtgoappraiser.http.mtggoldfish.MtgGoldfishIndexRequestor;
 import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
@@ -16,6 +20,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.management.MXBean;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -23,12 +28,12 @@ import java.time.LocalDate;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "com.cd.mtgoappraiser" })
+@ComponentScan({ "com.cd.mtgoappraiser"})
 @PropertySources({
-    @PropertySource(value = { "classpath:application.properties" }),
-    @PropertySource(value = "file:./application.properties", ignoreResourceNotFound = true )
+    @PropertySource(value = { "classpath:appraiser-application.properties" }),
+    @PropertySource(value = "file:./appraiser-application.properties", ignoreResourceNotFound = true )
 })
-
+@Import(WrapperConfig.class)
 public class AppraiserConfig {
 
     @Autowired
@@ -150,5 +155,32 @@ public class AppraiserConfig {
     public Double priceThreshold() {
         return Double.parseDouble(environment.getRequiredProperty("price.threshold"));
     }
+
+    @Bean
+    public String accountName() {
+        return environment.getRequiredProperty("account.name");
+    }
+
+    @Bean
+    public String botApiUrl() {
+        return environment.getRequiredProperty("bot.api.url");
+    }
+
+    @Bean
+    public AppraisedCardBotUpdater appraisedCardBotUpdater() {
+        return new AppraisedCardBotUpdater();
+    }
+
+    @Bean
+    public OwnedTradeableCardService ownedTradeableCardService() {
+        return new OwnedTradeableCardService();
+    }
+
+    @Bean
+    public BotCameraService botCameraService() {
+        return new BotCameraService();
+    }
+
 }
+
 

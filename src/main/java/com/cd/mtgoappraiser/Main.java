@@ -5,7 +5,7 @@ import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
 import com.cd.mtgoappraiser.csv.TimeSeriesAppraisalCsvProducer;
-import com.cd.mtgoappraiser.http.JsoupCacheManager;
+import com.cd.mtgoappraiser.http.bot.AppraisedCardBotUpdater;
 import com.cd.mtgoappraiser.http.mtgotraders.MtgoTradersHotListParser;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import com.cd.mtgoappraiser.model.Card;
@@ -15,21 +15,14 @@ import com.cd.mtgoappraiser.model.TimeSeriesCard;
 import com.cd.mtgoappraiser.timeseries.TimeSeriesFileAppraiser;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -98,6 +91,8 @@ public class Main {
         MtgGoldfishIndexRequestor mtgGoldfishIndexRequestor = (MtgGoldfishIndexRequestor) applicationContext.getBean("mtgGoldfishIndexRequestor");
         AppraisedCsvProducer appraisedCsvProducer = (AppraisedCsvProducer) applicationContext.getBean("appraisedCsvProducer");
         MtgoTradersHotListParser mtgoTradersHotListParser = (MtgoTradersHotListParser) applicationContext.getBean("mtgoTradersHotListParser");
+        AppraisedCardBotUpdater appraisedCardBotUpdater = (AppraisedCardBotUpdater) applicationContext.getBean("appraisedCardBotUpdater");
+
         URL mtgoCollectionUrl = (URL) applicationContext.getBean("mtgoCollectionUrl");
         //End spring setup
 
@@ -158,5 +153,7 @@ public class Main {
         appraisedCards.sort(Comparator.comparing(AppraisedCard::getMtgoTradersBuyPrice).reversed());
 
         appraisedCsvProducer.printAppraisedCards(appraisedCards);
+
+        appraisedCardBotUpdater.updateApi(appraisedCards);
     }
 }
