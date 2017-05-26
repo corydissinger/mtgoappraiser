@@ -6,13 +6,7 @@
 	<artifactId>mtgo-appraiser</artifactId>
 	<name>mtgo-appraiser</name>
 	<packaging>jar</packaging>
-	<version>${project.version}</version>
-
-	<parent>
-		<groupId>com.cd.bot</groupId>
-		<artifactId>mtgo-best-bot</artifactId>
-		<version>1.0.2</version>
-	</parent>
+	<version>1.0.2</version>
 
 	<properties>
 		<java-version>1.8</java-version>
@@ -26,6 +20,24 @@
 			<groupId>com.cd.bot.wrapper</groupId>
 			<artifactId>bot-api-wrapper</artifactId>
 			<version>1.0.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.cd.bot.model</groupId>
+			<artifactId>bot-model</artifactId>
+			<version>1.0.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Commons CSV -->
@@ -46,6 +58,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
+			<version>4.3.8.RELEASE</version>
 			<exclusions>
 				<!-- Exclude Commons Logging in favor of SLF4j -->
 				<exclusion>
@@ -58,11 +71,13 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
+			<version>4.3.8.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
+			<version>4.3.8.RELEASE</version>
 		</dependency>
 
 		<!-- AspectJ -->
@@ -132,6 +147,20 @@
 			<version>3.4</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.5.3</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.googlecode.htmlcompressor</groupId>
 			<artifactId>htmlcompressor</artifactId>
@@ -142,12 +171,14 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
+			<version>4.3.8.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -268,34 +299,32 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<id>make-jar-with-deps</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
+						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<archive>
-								<manifest>
-									<mainClass>com.cd.mtgoappraiser.Main</mainClass>
-								</manifest>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-					<execution>
-						<id>make-zip</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptor>src/assembly/assembly.xml</descriptor>
+							<artifactSet>
+								<excludes>
+									<exclude>gnu*:*</exclude>
+									<exclude>springfox*:*</exclude>
+									<exclude>groovy*:*</exclude>
+									<exclude>tess*:*</exclude>
+									<exclude>antlr*:*</exclude>
+								</excludes>
+							</artifactSet>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>com.cd.mtgoappraiser.Main</Main-Class>
+									</manifestEntries>
+								</transformer>
+							</transformers>
 						</configuration>
 					</execution>
 				</executions>

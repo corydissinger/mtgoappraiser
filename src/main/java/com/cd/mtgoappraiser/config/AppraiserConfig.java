@@ -1,6 +1,6 @@
 package com.cd.mtgoappraiser.config;
 
-import com.cd.bot.wrapper.WrapperConfig;
+import com.cd.bot.wrapper.ApiWrapperConfig;
 import com.cd.bot.wrapper.http.BotCameraService;
 import com.cd.bot.wrapper.http.OwnedTradeableCardService;
 import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
@@ -20,7 +20,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.management.MXBean;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -33,7 +32,7 @@ import java.time.LocalDate;
     @PropertySource(value = { "classpath:appraiser-application.properties" }),
     @PropertySource(value = "file:./appraiser-application.properties", ignoreResourceNotFound = true )
 })
-@Import(WrapperConfig.class)
+@Import(ApiWrapperConfig.class)
 public class AppraiserConfig {
 
     @Autowired

@@ -2,11 +2,9 @@ package com.cd.mtgoappraiser.http.bot;
 
 import com.cd.bot.model.domain.Card;
 import com.cd.bot.model.domain.OwnedTradeableCard;
-import com.cd.bot.model.domain.PlayerBot;
 import com.cd.bot.wrapper.http.OwnedTradeableCardService;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;

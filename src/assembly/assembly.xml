@@ -6,6 +6,15 @@
         <format>tar.gz</format>
         <format>zip</format>
     </formats>
+    <dependencySets>
+        <dependencySet>
+            <inclusions>
+                <inclusion>
+                    com.cd.bot.model:bot-model
+                </inclusion>
+            </inclusions>
+        </dependencySet>
+    </dependencySets>
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/staging</directory>

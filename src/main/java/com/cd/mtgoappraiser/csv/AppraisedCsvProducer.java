@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,23 +20,32 @@ public class AppraisedCsvProducer extends AbstractCsvProducer {
     private String mtgGoldfishBaseUrl;
 
     public void printAppraisedCards(List<AppraisedCard> appraisedCards) {
+        List<Double> goldfishRetail = new ArrayList<>();
+        List<Double> mtgotradersBuylist = new ArrayList<>();
         CSVPrinter printer = null;
         try {
             printer = getCsvPrinter(outputFile);
 
             for(AppraisedCard appraisedCard : appraisedCards) {
-                try {
-                    printer.printRecord(appraisedCard.getName(),
-                                        appraisedCard.getSet(),
-                                        appraisedCard.getQuantity(),
-                                        appraisedCard.isPremium() ? "Yes" : "No",
-                                        appraisedCard.getMtgGoldfishRetailAggregate(),
-                                        appraisedCard.getMtgoTradersBuyPrice(),
-                                        appraisedCard.getLink() != null ? mtgGoldfishBaseUrl + appraisedCard.getLink() : "NA");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mtgotradersBuylist.add(appraisedCard.getMtgoTradersBuyPrice());
+                goldfishRetail.add(appraisedCard.getMtgGoldfishRetailAggregate());
+
+                printer.printRecord(appraisedCard.getName(),
+                                    appraisedCard.getSet(),
+                                    appraisedCard.getQuantity(),
+                                    appraisedCard.isPremium() ? "Yes" : "No",
+                                    appraisedCard.getMtgGoldfishRetailAggregate(),
+                                    appraisedCard.getMtgoTradersBuyPrice(),
+                                    appraisedCard.getLink() != null ? mtgGoldfishBaseUrl + appraisedCard.getLink() : "NA");
             }
+
+            printer.printRecord("TOTALS ----->",
+                    null,
+                    null,
+                    null,
+                    goldfishRetail.stream().mapToDouble(a -> new Double(a)).sum(),
+                    mtgotradersBuylist.stream().mapToDouble(a -> new Double(a)).sum(),
+                    null);
 
             System.out.println("Created appraised collection here: " + outputFile);
         } catch (IOException e) {
