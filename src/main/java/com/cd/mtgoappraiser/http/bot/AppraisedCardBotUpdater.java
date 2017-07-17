@@ -1,12 +1,13 @@
 package com.cd.mtgoappraiser.http.bot;
 
-import com.cd.bot.model.domain.Card;
-import com.cd.bot.model.domain.OwnedTradeableCard;
-import com.cd.bot.wrapper.http.OwnedTradeableCardService;
+import com.cd.bot.model.domain.PlayerBot;
+import com.cd.bot.model.domain.repository.PlayerBotRepository;
+import com.cd.bot.model.domain.trade.Card;
+import com.cd.bot.model.domain.trade.OwnedTradeableCard;
+import com.cd.bot.model.domain.repository.OwnedTradeableCardRepository;
 import com.cd.mtgoappraiser.model.AppraisedCard;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,30 +17,32 @@ public class AppraisedCardBotUpdater {
     @Autowired
     private String accountName;
 
-    @Autowired
-    private OwnedTradeableCardService ownedTradeableCardService;
+    private OwnedTradeableCardRepository ownedTradeableCardRepository;
+
+    private PlayerBotRepository playerBotRepository;
+
+    public void setOwnedTradeableCardRepository(OwnedTradeableCardRepository ownedTradeableCardRepository) {
+        this.ownedTradeableCardRepository = ownedTradeableCardRepository;
+    }
+
+    public void setPlayerBotRepository(PlayerBotRepository playerBotRepository) {
+        this.playerBotRepository = playerBotRepository;
+    }
 
     public void updateApi(List<AppraisedCard> appraisedCards) {
-        List<OwnedTradeableCard> cardsToPost = new ArrayList<>();
+        PlayerBot playerBot = playerBotRepository.findByName(accountName);
 
-        for(int i = 0; i < appraisedCards.size(); i++) {
-            AppraisedCard card = appraisedCards.get(i);
+        for(AppraisedCard card : appraisedCards) {
             OwnedTradeableCard ownedTradeableCard = new OwnedTradeableCard();
 
             Card modelCard = new Card(card.getName(), card.getSet(), card.isPremium());
 
             ownedTradeableCard.setQuantity(card.getQuantity());
-
             ownedTradeableCard.setCard(modelCard);
+            ownedTradeableCard.setPlayerBot(playerBot);
 
-            cardsToPost.add(ownedTradeableCard);
-
-            if (cardsToPost.size() % 100 == 0) {
-                ownedTradeableCardService.addCards(cardsToPost, accountName);
-                cardsToPost = new ArrayList<>();
-            }
+            ownedTradeableCardRepository.save(ownedTradeableCard);
         }
-
-        ownedTradeableCardService.addCards(cardsToPost, accountName);
     }
+
 }

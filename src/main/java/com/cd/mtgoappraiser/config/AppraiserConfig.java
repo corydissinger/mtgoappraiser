@@ -1,8 +1,7 @@
 package com.cd.mtgoappraiser.config;
 
-import com.cd.bot.wrapper.ApiWrapperConfig;
-import com.cd.bot.wrapper.http.BotCameraService;
-import com.cd.bot.wrapper.http.OwnedTradeableCardService;
+import com.cd.bot.model.domain.repository.OwnedTradeableCardRepository;
+import com.cd.bot.model.domain.repository.PlayerBotRepository;
 import com.cd.mtgoappraiser.csv.AppraisedCsvParser;
 import com.cd.mtgoappraiser.csv.AppraisedCsvProducer;
 import com.cd.mtgoappraiser.csv.MtgoCSVParser;
@@ -18,21 +17,24 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 
-@Configuration
-@EnableTransactionManagement
+@SpringBootApplication
+@EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
+@EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
 @ComponentScan({ "com.cd.mtgoappraiser"})
 @PropertySources({
     @PropertySource(value = { "classpath:appraiser-application.properties" }),
     @PropertySource(value = "file:./appraiser-application.properties", ignoreResourceNotFound = true )
 })
-@Import(ApiWrapperConfig.class)
 public class AppraiserConfig {
 
     @Autowired
@@ -161,24 +163,20 @@ public class AppraiserConfig {
     }
 
     @Bean
-    public String botApiUrl() {
-        return environment.getRequiredProperty("bot.api.url");
-    }
-
-    @Bean
     public AppraisedCardBotUpdater appraisedCardBotUpdater() {
-        return new AppraisedCardBotUpdater();
+        AppraisedCardBotUpdater appraisedCardBotUpdater = new AppraisedCardBotUpdater();
+
+        appraisedCardBotUpdater.setOwnedTradeableCardRepository(ownedTradeableCardRepository);
+        appraisedCardBotUpdater.setPlayerBotRepository(playerBotRepository);
+
+        return appraisedCardBotUpdater;
     }
 
-    @Bean
-    public OwnedTradeableCardService ownedTradeableCardService() {
-        return new OwnedTradeableCardService();
-    }
+    @Autowired
+    PlayerBotRepository playerBotRepository;
 
-    @Bean
-    public BotCameraService botCameraService() {
-        return new BotCameraService();
-    }
+    @Autowired
+    OwnedTradeableCardRepository ownedTradeableCardRepository;
 
 }
 
