@@ -15,6 +15,7 @@ import com.cd.mtgoappraiser.timeseries.TimeSeriesFileAppraiser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -29,6 +30,7 @@ import java.time.LocalDate;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = {"com.cd.bot.model.domain"} )
+@EntityScan(basePackages = {"com.cd.bot.model.domain"} )
 @EnableAutoConfiguration(exclude={WebMvcAutoConfiguration.class})
 @ComponentScan({ "com.cd.mtgoappraiser"})
 @PropertySources({
