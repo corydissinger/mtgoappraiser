@@ -4,6 +4,12 @@ mtgoappraiser is a fantastic GPL utility I've used for quickly aggregating multi
 
 At any point the 'owners' of 'secondary market information' may file an 'issue' with this repository pointing to specific 'rules' that may have been 'broken'. Upon receiving such an 'issue' I will rectify the code post-haste.
 
+# How do I use this?
+
+First, [install maven](https://maven.apache.org/install.html)
+
+Assuming you've installed maven, then you can do [this](https://github.com/corydissinger/mtgoappraiser/tree/master/src/main/resources)
+
 # Contributing?
 
 To do list:
