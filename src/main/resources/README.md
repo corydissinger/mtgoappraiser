@@ -15,7 +15,8 @@ Some people are meanies and try to out-dumb scraping by having 'obfuscation CSS'
 
 If my.really.smrt.subdomain.com understood how to interrogate HTTP Headers more effectively, they might not have wasted their time on such a trivially circumvented solution. Oh well, some people want to pay money to smart sounding people for the sake of lightning cash on fire.
 
-`<html>
+```
+<html>
   <head>
   ... irrelevant requests and/or tragically terrible inline <script> or <style> tags ...
     <style>
@@ -51,7 +52,8 @@ If my.really.smrt.subdomain.com understood how to interrogate HTTP Headers more 
     <div class="coYlfk2 NsfUve PoYqhC">&nbsp;</div>
     ... continued nonsense
   </body>
-</html>`
+</html>
+```
 
 # About your appraised collection CSV
 
