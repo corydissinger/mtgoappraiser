@@ -20,9 +20,9 @@ If my.really.smrt.subdomain.com understood how to interrogate HTTP Headers more 
   <head>
   ... irrelevant requests and/or tragically terrible inline <script> or <style> tags ...
     <style>
-      .PoYqhC {		background-image:url(//my.really.smrt.subdomain.com/price_icons?id=someComicallyHashedString);	}	
-      .NsfUve {		width:7px;		float:left;		height:14px;	}
-      .jpgcMq {background-position:-56px -2px;}
+    .PoYqhC {background-image:url(//my.really.smrt.subdomain.com/price_icons?id=someComicallyHashedString);}	
+    .NsfUve {width:7px; float:left; height:14px}
+    .jpgcMq {background-position:-56px -2px;}
     .jpgcMq2 {background-position:-56px 21px;}
     .iJjfsm {background-position:-35px -2px;}
     .iJjfsm2 {background-position:-35px 21px;}
@@ -48,9 +48,9 @@ If my.really.smrt.subdomain.com understood how to interrogate HTTP Headers more 
   ... irrelevant requests and/or tragically terrible inline <script> or <style> tags ...    
   </head>
   <body>
-    ... arbitrary nonsense
+    ... arbitrary nonsense ...
     <div class="coYlfk2 NsfUve PoYqhC">&nbsp;</div>
-    ... continued nonsense
+    ... continued nonsense ...
   </body>
 </html>
 ```
